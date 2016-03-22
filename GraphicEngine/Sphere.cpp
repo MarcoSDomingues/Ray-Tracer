@@ -1,7 +1,7 @@
 #include "Sphere.h"
 
 bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance) {
-	//if there is any problem we should try to normalize all the lenghts
+	//if there is any problem we should try to normalize vectors
 	Vector3 sphereCenter = Vector3(center.x, center.y, center.z);
 	Vector3 vpc = ray.origin - sphereCenter; // vector from ray.origin to sphere.center
 	Vector3 pc = ray.origin + sphereCenter * ray.direction; //projection of the center of the sphere in the ray 
