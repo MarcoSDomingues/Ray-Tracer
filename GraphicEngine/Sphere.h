@@ -15,6 +15,6 @@ public:
 	Sphere(const Center &c, float r, const Material &mat)
 		: GeometricObject(mat), center(c), radius(r) {}
 
-	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance, Vector3 &normal);
+	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance);
 
 };

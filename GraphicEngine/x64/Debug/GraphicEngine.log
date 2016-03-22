@@ -1,13 +1,1 @@
-﻿Build started 17/02/2016 22:15:03.
-     1>Project "\\vmware-host\shared folders\documents\visual studio 2015\Projects\GraphicEngine\GraphicEngine\GraphicEngine.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt main.cpp
-         main.cpp
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"\\vmware-host\shared folders\documents\visual studio 2015\Projects\GraphicEngine\x64\Debug\GraphicEngine.exe" /INCREMENTAL /NOLOGO /LIBPATH:Dependencies\freeglut /LIBPATH:Dependencies\glew opengl32.lib freeglut.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"\\vmware-host\shared folders\documents\visual studio 2015\Projects\GraphicEngine\x64\Debug\GraphicEngine.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"\\vmware-host\shared folders\documents\visual studio 2015\Projects\GraphicEngine\x64\Debug\GraphicEngine.lib" /MACHINE:X64 x64\Debug\main.obj
-         GraphicEngine.vcxproj -> \\vmware-host\shared folders\documents\visual studio 2015\Projects\GraphicEngine\x64\Debug\GraphicEngine.exe
-     1>Done Building Project "\\vmware-host\shared folders\documents\visual studio 2015\Projects\GraphicEngine\GraphicEngine\GraphicEngine.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:02.56
+﻿
