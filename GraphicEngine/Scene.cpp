@@ -91,5 +91,26 @@ const void Scene::parseFile(std::string& filename) {
 }
 
 Ray Scene::camGetPrimaryRay(int x, int y) {
-	//to do
+    Vector3 ze = (camera.eye - camera.at).normalize();
+    Vector3 xe = (camera.up.cross(ze)).normalize();
+    Vector3 ye = ze.cross(xe);
+
+    float df = (camera.eye - camera.at).length();
+
+    float resX = camera.resolution.WinX;
+    float resY = camera.resolution.WinY;
+
+    float h = 2 * df * tan(camera.fovy / 2);
+    float w = (resX / resY) * h;
+
+    Ray ray;
+    ray.origin = camera.eye;
+
+    Vector3 dirX = w * (x / resX - 1 / 2) * xe;
+    Vector3 dirY = h * (y / resY - 1 / 2) * ye;
+    Vector3 dirZ = -df * ze;
+
+    ray.direction = dirX + dirY + dirZ;
+
+    return ray;
 }
