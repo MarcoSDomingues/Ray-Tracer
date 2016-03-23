@@ -12,12 +12,14 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 		}
 		else if (vpc.length() == radius) { // one hitPoint
 			hitpoint = ray.origin;
+			normal = (hitpoint - sphereCenter).normalize();
 		}
 		else { // occurs when ray.origin is inside the sphere
 			float temp = (pc - sphereCenter).length();
 			float dist = sqrt(radius * radius - temp * temp);
 			distance = dist - (pc - ray.origin).length();
 			hitpoint = ray.origin + ray.direction * distance;
+			normal = (hitpoint - sphereCenter).normalize();
 		}
 	}
 	else { // center of sphere projects on the ray
@@ -34,6 +36,7 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 				distance = (pc - ray.origin).length() + dist;
 			}
 			hitpoint = ray.origin + ray.direction * distance;
+			normal = (hitpoint - sphereCenter).normalize();
 		}
 	}
 	return true;

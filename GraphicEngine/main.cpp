@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <stdio.h>
+#include <limits>
 
 #include "Dependencies/glew/glew.h"
 #include "Dependencies/freeglut/freeglut.h"
@@ -52,7 +53,67 @@ int WindowHandle = 0;
 
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
-    //to do
+	Color color;
+
+	int objID = 0;
+	Vector3 hitPoint, hit;
+	bool has_collision = false;
+
+	float distance;
+	float min_Distance = std::numeric_limits<float>::infinity();
+
+    //intersect ray with all objects
+	for (int i = 0; i < scene->objects.size(); i++) {
+		if (scene->objects[i].checkIntersection(ray, hit, distance)) {
+			//find the closest hiitpoint
+			if (distance < min_Distance) {
+				min_Distance = distance;
+				hitPoint = hit;
+				has_collision = true;
+				objID = i;
+			}
+		}
+	}
+
+	if (!has_collision) {
+		color.r = scene->background[0];
+		color.g = scene->background[1];
+		color.b = scene->background[2];
+		return color;
+	}
+	else {
+		color.r = scene->objects[objID].material.r;
+		color.g = scene->objects[objID].material.g;
+		color.b = scene->objects[objID].material.b;
+
+		//compute normal at hitpoint
+		Vector3 normal = scene->objects[objID].normal;
+
+		for (int i = 0; i < scene->lights.size(); i++) {
+			Vector3 lightPos = Vector3(scene->lights[i].x, scene->lights[i].y, scene->lights[i].z);
+			Vector3 L = (lightPos - hitPoint).normalize();
+
+			if (L.dot(normal) > 0) {
+				Ray shadowFiller;
+				shadowFiller.origin = hitPoint;
+				shadowFiller.direction = L;
+
+				//point in shadow??
+				for (int k = 0; k < scene->objects.size(); k++) {
+					if (!scene->objects[k].checkIntersection(shadowFiller, hit, distance)) {
+						color.r += scene->objects[k].material.kd + scene->objects[k].material.ks;
+						color.g += scene->objects[k].material.kd + scene->objects[k].material.ks;
+						color.b += scene->objects[k].material.kd + scene->objects[k].material.ks;
+					}
+				}
+			}
+		}
+
+		if (depth >= MAX_DEPTH)	return color;
+
+		return color;
+
+	}
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -332,7 +393,7 @@ void init(int argc, char* argv[])
     setupGLUT(argc, argv);
     setupGLEW();
     std::cerr << "CONTEXT: OpenGL v" << glGetString(GL_VERSION) << std::endl;
-    glClearColor(scene->background[0], scene->background[1], scene->background[2], scene->background[3]);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     createShaderProgram();
     createBufferObjects();
     setupCallbacks();
@@ -340,7 +401,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/testFile.nff"));
+	scene = new Scene(std::string("NFF/testFile.obj"));
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;
     

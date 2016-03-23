@@ -1,60 +1,21 @@
-﻿  main.cpp
-  Scene.cpp
-c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(655): error C2259: 'GeometricObject': cannot instantiate abstract class
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(655): note: due to following members:
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(655): note: 'bool GeometricObject::checkIntersection(const Ray &,Vector3 &,float &)': is abstract
-  c:\users\tiago\documents\github\ray-tracer\graphicengine\geometricobject.h(14): note: see declaration of 'GeometricObject::checkIntersection'
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(773): note: see reference to function template instantiation 'void std::allocator<_Ty>::construct<_Objty,GeometricObject&>(_Objty *,GeometricObject &)' being compiled
-          with
-          [
-              _Ty=GeometricObject,
-              _Objty=GeometricObject
-          ]
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(773): note: see reference to function template instantiation 'void std::allocator<_Ty>::construct<_Objty,GeometricObject&>(_Objty *,GeometricObject &)' being compiled
-          with
-          [
-              _Ty=GeometricObject,
-              _Objty=GeometricObject
-          ]
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(918): note: see reference to function template instantiation 'void std::allocator_traits<_Alloc>::construct<_Ty,GeometricObject&>(std::allocator<_Ty> &,_Objty *,GeometricObject &)' being compiled
-          with
-          [
-              _Alloc=std::allocator<GeometricObject>,
-              _Ty=GeometricObject,
-              _Objty=GeometricObject
-          ]
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(917): note: see reference to function template instantiation 'void std::allocator_traits<_Alloc>::construct<_Ty,GeometricObject&>(std::allocator<_Ty> &,_Objty *,GeometricObject &)' being compiled
-          with
-          [
-              _Alloc=std::allocator<GeometricObject>,
-              _Ty=GeometricObject,
-              _Objty=GeometricObject
-          ]
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1282): note: see reference to function template instantiation 'void std::_Wrap_alloc<std::allocator<_Ty>>::construct<GeometricObject,GeometricObject&>(_Ty *,GeometricObject &)' being compiled
-          with
-          [
-              _Ty=GeometricObject
-          ]
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1281): note: see reference to function template instantiation 'void std::_Wrap_alloc<std::allocator<_Ty>>::construct<GeometricObject,GeometricObject&>(_Ty *,GeometricObject &)' being compiled
-          with
-          [
-              _Ty=GeometricObject
-          ]
-  c:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1274): note: while compiling class template member function 'void std::vector<GeometricObject,std::allocator<_Ty>>::push_back(const GeometricObject &)'
-          with
-          [
-              _Ty=GeometricObject
-          ]
-  c:\users\tiago\documents\github\ray-tracer\graphicengine\scene.cpp(54): note: see reference to function template instantiation 'void std::vector<GeometricObject,std::allocator<_Ty>>::push_back(const GeometricObject &)' being compiled
-          with
-          [
-              _Ty=GeometricObject
-          ]
-  c:\users\tiago\documents\github\ray-tracer\graphicengine\scene.h(27): note: see reference to class template instantiation 'std::vector<GeometricObject,std::allocator<_Ty>>' being compiled
-          with
-          [
-              _Ty=GeometricObject
-          ]
-  Plane.cpp
-  Generating Code...
-c:\users\tiago\documents\github\ray-tracer\graphicengine\main.cpp(56): error C4716: 'rayTracing': must return a value
+﻿Build started 23/03/2016 19:13:17.
+     1>Project "\\vmware-host\Shared Folders\Desktop\Ray-Tracer\GraphicEngine\GraphicEngine.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt Scene.cpp main.cpp
+         main.cpp
+         Scene.cpp
+     1>\\vmware-host\shared folders\desktop\ray-tracer\graphicengine\scene.cpp(103): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+     1>\\vmware-host\shared folders\desktop\ray-tracer\graphicengine\scene.cpp(104): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+         Generating Code...
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"\\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.exe" /INCREMENTAL /NOLOGO /LIBPATH:Dependencies\freeglut /LIBPATH:Dependencies\glew opengl32.lib freeglut.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"\\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"\\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.lib" /MACHINE:X64 x64\Debug\GeometricObject.obj
+         x64\Debug\main.obj
+         x64\Debug\Plane.obj
+         x64\Debug\Scene.obj
+         x64\Debug\Sphere.obj
+         GraphicEngine.vcxproj -> \\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.exe
+     1>Done Building Project "\\vmware-host\Shared Folders\Desktop\Ray-Tracer\GraphicEngine\GraphicEngine.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:06.24
