@@ -1,7 +1,2 @@
 ﻿  Sphere.cpp
-  Scene.cpp
-c:\users\tiago\documents\github\ray-tracer\graphicengine\scene.cpp(99): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\tiago\documents\github\ray-tracer\graphicengine\scene.cpp(100): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-  Plane.cpp
-  Generating Code...
   GraphicEngine.vcxproj -> C:\Users\Tiago\Documents\GitHub\Ray-Tracer\x64\Debug\GraphicEngine.exe

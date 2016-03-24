@@ -3,11 +3,12 @@
 bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance) {
 
 	Vector3 sphereCenter = Vector3(center.x, center.y, center.z).normalize();
-	Vector3 vpc = ray.origin - sphereCenter; // vector from ray.origin to sphere.center
-	Vector3 pc = ray.origin + sphereCenter * ray.direction; //projection of the center of the sphere in the ray 
+	Vector3 vpc = sphereCenter - ray.origin; // vector from ray.origin to sphere.center
+	Vector3 pc = ray.origin + ((ray.direction - ray.origin).dot(vpc) / (ray.direction - ray.origin).length()) * (ray.direction - ray.origin); //projection of the center of the sphere in the ray 
 
 	if (vpc.dot(ray.direction) < 0) { // when the sphere is behind the origin p
 		if (vpc.length() > radius) { // there is no intersection
+			std::cout << "entrei";
 			return false;
 		}
 		else if (vpc.length() == radius) { // one hitPoint
