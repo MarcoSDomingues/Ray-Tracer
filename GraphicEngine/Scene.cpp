@@ -99,7 +99,7 @@ Ray Scene::camGetPrimaryRay(int x, int y) {
     float resX = camera.resolution.WinX;
     float resY = camera.resolution.WinY;
 
-    float h = 2 * df * tan(camera.fovy / 2);
+    float h = df * tan(camera.fovy / 2);
     float w = (resX / resY) * h;
 
     Ray ray;
@@ -109,7 +109,9 @@ Ray Scene::camGetPrimaryRay(int x, int y) {
     Vector3 dirY = h * (y / resY - 1 / 2) * ye;
     Vector3 dirZ = -df * ze;
 
-    ray.direction = dirX + dirY + dirZ;
+	Vector3 tempDirection = dirX + dirY + dirZ;
+
+    ray.direction = tempDirection.normalize();
 
     return ray;
 }

@@ -1,12 +1,12 @@
 #include "Sphere.h"
 
 bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance) {
-	//if there is any problem we should try to normalize vectors
-	Vector3 sphereCenter = Vector3(center.x, center.y, center.z);
+
+	Vector3 sphereCenter = Vector3(center.x, center.y, center.z).normalize();
 	Vector3 vpc = ray.origin - sphereCenter; // vector from ray.origin to sphere.center
 	Vector3 pc = ray.origin + sphereCenter * ray.direction; //projection of the center of the sphere in the ray 
 
-	if ((vpc.dot(ray.direction)) < 0) { // when the sphere is behind the origin p
+	if (vpc.dot(ray.direction) < 0) { // when the sphere is behind the origin p
 		if (vpc.length() > radius) { // there is no intersection
 			return false;
 		}
@@ -39,5 +39,5 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 			normal = (hitpoint - sphereCenter).normalize();
 		}
 	}
-	return true;
+	return false;
 }
