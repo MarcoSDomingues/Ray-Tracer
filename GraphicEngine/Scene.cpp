@@ -31,7 +31,6 @@ void Scene::parseHither(std::stringstream& sin) {
 
 void Scene::parseResolution(std::stringstream& sin) {
 	sin >> camera.resolution.WinX >> camera.resolution.WinY;
-	std::cout <<"Puta: " << camera.resolution.WinX << std::endl;
 }
 
 void Scene::parseLight(std::stringstream& sin) {
@@ -41,7 +40,6 @@ void Scene::parseLight(std::stringstream& sin) {
 }
 
 void Scene::parseMaterial(std::stringstream& sin) {
-	Material mat;
 	sin >> mat.r >> mat.g >> mat.b >> mat.kd >> mat.ks >> mat.shine >> mat.t >> mat.iof;
 }
 
@@ -85,10 +83,8 @@ void Scene::parseLine(std::stringstream& sin) {
 const void Scene::parseFile(std::string& filename) {
 	std::ifstream ifile(filename);
 	while (ifile.good()) {
-		std::cout << "lets go!!!" << std::endl;
 		std::string line;
 		std::getline(ifile, line);
-		std::cout << line << std::endl;
 		parseLine(std::stringstream(line));
 	}
 }
