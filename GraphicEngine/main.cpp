@@ -59,12 +59,13 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 hitPoint, hit;
 	bool has_collision = false;
 
-	float distance;
+	float distance = 0.0f;
 	float min_Distance = std::numeric_limits<float>::infinity();
 
     //intersect ray with all objects
 	for (int i = 0; i < scene->objects.size(); i++) {
-		if (scene->objects[i].checkIntersection(ray, hit, distance)) {
+		if (scene->objects[i]->checkIntersection(ray, hit, distance)) {
+
 			//find the closest hiitpoint
 			if (distance < min_Distance) {
 				min_Distance = distance;
@@ -82,12 +83,12 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		return color;
 	}
 	else {
-		color.r = scene->objects[objID].material.r;
-		color.g = scene->objects[objID].material.g;
-		color.b = scene->objects[objID].material.b;
+		color.r = scene->objects[objID]->material.r;
+		color.g = scene->objects[objID]->material.g;
+		color.b = scene->objects[objID]->material.b;
 
 		//compute normal at hitpoint
-		Vector3 normal = scene->objects[objID].normal;
+		Vector3 normal = scene->objects[objID]->normal;
 
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Vector3 lightPos = Vector3(scene->lights[i].x, scene->lights[i].y, scene->lights[i].z);
@@ -100,10 +101,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				//point in shadow??
 				for (int k = 0; k < scene->objects.size(); k++) {
-					if (!scene->objects[k].checkIntersection(shadowFiller, hit, distance)) {
-						color.r += scene->objects[k].material.kd + scene->objects[k].material.ks;
-						color.g += scene->objects[k].material.kd + scene->objects[k].material.ks;
-						color.b += scene->objects[k].material.kd + scene->objects[k].material.ks;
+					if (!scene->objects[k]->checkIntersection(shadowFiller, hit, distance)) {
+						color.r += scene->objects[k]->material.kd + scene->objects[k]->material.ks;
+						color.g += scene->objects[k]->material.kd + scene->objects[k]->material.ks;
+						color.b += scene->objects[k]->material.kd + scene->objects[k]->material.ks;
 					}
 				}
 			}

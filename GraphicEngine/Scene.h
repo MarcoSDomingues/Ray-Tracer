@@ -24,7 +24,7 @@ public:
 	Material mat;
 
 	std::vector<Light> lights;
-	std::vector<GeometricObject> objects;
+	std::vector<GeometricObject*> objects;
 
 	Scene(std::string& filename);
 

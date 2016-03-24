@@ -51,7 +51,7 @@ void Scene::parsePlane(std::stringstream& sin) {
 		p1.x >> p1.y >> p1.z >>
 		p2.x >>p2.y >> p2.z >>
 		p3.x >> p3.y >> p3.z;
-	Plane pl(p1, p2, p3, mat);
+	Plane *pl = new Plane(p1, p2, p3, mat);
 	objects.push_back(pl);
 }
 
@@ -61,7 +61,7 @@ void Scene::parseSphere(std::stringstream& sin) {
 	
 	sin >> center.x >> center.y >> center.z >> radius;
 
-	Sphere sphere(center, radius, mat);
+	Sphere *sphere = new Sphere(center, radius, mat);
 	objects.push_back(sphere);
 }
 

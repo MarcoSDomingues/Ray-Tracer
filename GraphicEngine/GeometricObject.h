@@ -12,7 +12,6 @@ public:
 	GeometricObject(Material mat)
 		: material(mat) {}
 
-	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance) {
-		return false;
-	}
+	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance) = 0;
+
 };
