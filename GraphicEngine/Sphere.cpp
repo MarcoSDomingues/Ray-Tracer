@@ -14,6 +14,7 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 	float squareDistanceZ = ((center.z - ray.origin.z) * (center.z - ray.origin.z));
 
 	float squareDistance = squareDistanceX + squareDistanceY + squareDistanceZ;
+	distance = sqrt(squareDistance);
 
 	//compare square distance with square sphere radius
 	float squareRadius = radius * radius;

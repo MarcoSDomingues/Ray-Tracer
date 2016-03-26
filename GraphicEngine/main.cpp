@@ -51,6 +51,37 @@ int WindowHandle = 0;
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
+Color shade(const Color& c, const Vector3 &hitpoint, const Vector3 &normal, const Material &mat) {
+	float attenuation = 0.0f, distance = 0.0f;
+	Vector3 hit;
+	Color color;
+
+	//for each light source
+	for (int i = 0; i < scene->lights.size(); i++) {
+		Vector3 lightPos = Vector3(scene->lights[i].x, scene->lights[i].y, scene->lights[i].z);
+		Vector3 d = (lightPos - hitpoint).normalize();
+
+		Ray shadowFiller;
+		shadowFiller.origin = hitpoint;
+		shadowFiller.direction = d;
+
+		//check intersection with shadow filler
+		for (int k = 0; k < scene->objects.size(); k++) {
+			if (scene->objects[k]->checkIntersection(shadowFiller, hit, distance)) {
+				attenuation = 1.0f;
+			}
+		}
+
+		color.r = c.r + attenuation * (mat.kd + mat.ks);
+		color.g = c.g + attenuation * (mat.kd + mat.ks);
+		color.b = c.b + attenuation * (mat.kd + mat.ks);
+
+	}
+
+	return color;
+}
+
+
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
 	Color color;
@@ -60,14 +91,17 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	bool has_collision = false;
 
 	float distance = 0.0f;
-	float min_Distance = std::numeric_limits<float>::infinity();
 
     //intersect ray with all objects
+	float maxDistance = -1;
 	for (int i = 0; i < scene->objects.size(); i++) {
 		if (scene->objects[i]->checkIntersection(ray, hit, distance)) {
-			hitPoint = hit;
-			has_collision = true;
-			objID = i;
+			if (distance <= maxDistance || maxDistance == -1) {
+				maxDistance = distance;
+				hitPoint = hit;
+				has_collision = true;
+				objID = i;
+			}
 		}
 	}
 
@@ -78,12 +112,16 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		return color;
 	}
 	else {
-		color.r = scene->objects[objID]->material.r;
-		color.g = scene->objects[objID]->material.g;
-		color.b = scene->objects[objID]->material.b;
 
 		//compute normal at hitpoint
 		Vector3 normal = scene->objects[objID]->normal;
+
+		Material mat = scene->objects[objID]->material;
+
+		color.r = mat.r * mat.kd;
+		color.g = mat.g * mat.kd;
+		color.b = mat.b * mat.kd;
+
 
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Vector3 lightPos = Vector3(scene->lights[i].x, scene->lights[i].y, scene->lights[i].z);
@@ -92,20 +130,30 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 n = normal.normalize();
 			Vector3 R = (2 * (L.dot(n))*(n - L)).normalize();
 
-			if (L.dot(n) > 0) {
-				Ray shadowFiller;
-				shadowFiller.origin = hitPoint;
-				shadowFiller.direction = L;
+			Light light = scene->lights[i];
 
-				//point in shadow??
+			Ray shadowFiller;
+			shadowFiller.origin = hitPoint;
+			shadowFiller.direction = L;
+
+			if (L.dot(n) > 0) {
+				float fs;
+
+				//check intersection with shadow filler
 				for (int k = 0; k < scene->objects.size(); k++) {
-					if (!scene->objects[k]->checkIntersection(shadowFiller, hit, distance)) {
-						color.r += scene->objects[k]->material.kd * n.dot(L) * scene->lights[i].r + scene->objects[k]->material.ks * scene->lights[i].r * R.dot(V);
-						color.g += scene->objects[k]->material.kd * n.dot(L) * scene->lights[i].g + scene->objects[k]->material.ks * scene->lights[i].g * R.dot(V);
-						color.b += scene->objects[k]->material.kd * n.dot(L) * scene->lights[i].b + scene->objects[k]->material.ks * scene->lights[i].b * R.dot(V);
+					if (scene->objects[k]->checkIntersection(shadowFiller, hit, distance)) {
+						fs = 0.0f;
+					}
+					else {
+						fs = 1.0f;
 					}
 				}
+
+				color.r += fs * ( ((light.r * mat.kd * (n.dot(L)))) + (light.r * mat.ks * (R.dot(L))));
+				color.g += fs * ( ((light.g * mat.kd * (n.dot(L)))) + (light.g * mat.ks * (R.dot(L))));
+				color.b += fs * ( ((light.b * mat.kd * (n.dot(L)))) + (light.b * mat.ks * (R.dot(L))));
 			}
+			
 		}
 
 		if (depth >= MAX_DEPTH)	return color;
