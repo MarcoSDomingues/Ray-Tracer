@@ -88,8 +88,11 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Vector3 lightPos = Vector3(scene->lights[i].x, scene->lights[i].y, scene->lights[i].z);
 			Vector3 L = (lightPos - hitPoint).normalize();
+			Vector3 V = (scene->camera.eye - hitPoint).normalize();
+			Vector3 n = normal.normalize();
+			Vector3 R = (2 * (L.dot(n))*(n - L)).normalize();
 
-			if (L.dot(normal) > 0) {
+			if (L.dot(n) > 0) {
 				Ray shadowFiller;
 				shadowFiller.origin = hitPoint;
 				shadowFiller.direction = L;
@@ -97,9 +100,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 				//point in shadow??
 				for (int k = 0; k < scene->objects.size(); k++) {
 					if (!scene->objects[k]->checkIntersection(shadowFiller, hit, distance)) {
-						color.r += scene->objects[k]->material.kd + scene->objects[k]->material.ks;
-						color.g += scene->objects[k]->material.kd + scene->objects[k]->material.ks;
-						color.b += scene->objects[k]->material.kd + scene->objects[k]->material.ks;
+						color.r += scene->objects[k]->material.kd * n.dot(L) * scene->lights[i].r + scene->objects[k]->material.ks * scene->lights[i].r * R.dot(V);
+						color.g += scene->objects[k]->material.kd * n.dot(L) * scene->lights[i].g + scene->objects[k]->material.ks * scene->lights[i].g * R.dot(V);
+						color.b += scene->objects[k]->material.kd * n.dot(L) * scene->lights[i].b + scene->objects[k]->material.ks * scene->lights[i].b * R.dot(V);
 					}
 				}
 			}
