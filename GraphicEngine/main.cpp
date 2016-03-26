@@ -293,7 +293,7 @@ void renderScene()
                 index_col=0;
             }
         }
-        printf("line %d", y);
+        //printf("line %d", y);
         if(draw_mode == 1) {  // desenhar o conte˙do da janela linha a linha
             drawPoints();
             index_pos=0;
