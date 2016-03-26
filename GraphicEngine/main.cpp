@@ -65,14 +65,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
     //intersect ray with all objects
 	for (int i = 0; i < scene->objects.size(); i++) {
 		if (scene->objects[i]->checkIntersection(ray, hit, distance)) {
-
-			//find the closest hiitpoint
-			if (distance < min_Distance) {
-				min_Distance = distance;
-				hitPoint = hit;
-				has_collision = true;
-				objID = i;
-			}
+			hitPoint = hit;
+			has_collision = true;
+			objID = i;
 		}
 	}
 

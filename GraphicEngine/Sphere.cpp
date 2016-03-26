@@ -2,43 +2,63 @@
 
 bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance) {
 
-	Vector3 sphereCenter = Vector3(center.x, center.y, center.z).normalize();
-	Vector3 vpc = sphereCenter - ray.origin; // vector from ray.origin to sphere.center
-	Vector3 pc = ray.origin + ((ray.direction - ray.origin).dot(vpc) / (ray.direction - ray.origin).length()) * (ray.direction - ray.origin); //projection of the center of the sphere in the ray 
+	//Vector3 sCenter = Vector3(center.x, center.y, center.z);
+	Vector3 rayDirection = ray.direction;
 
-	if (vpc.dot(ray.direction) < 0) { // when the sphere is behind the origin p
-		if (vpc.length() > radius) { // there is no intersection
-			std::cout << "entrei";
-			return false;
-		}
-		else if (vpc.length() == radius) { // one hitPoint
-			hitpoint = ray.origin;
-			normal = (hitpoint - sphereCenter).normalize();
-		}
-		else { // occurs when ray.origin is inside the sphere
-			float temp = (pc - sphereCenter).length();
-			float dist = sqrt(radius * radius - temp * temp);
-			distance = dist - (pc - ray.origin).length();
-			hitpoint = ray.origin + ray.direction * distance;
-			normal = (hitpoint - sphereCenter).normalize();
-		}
+	//normalize ray direction
+	rayDirection = rayDirection.normalize();
+	
+	//calculate square distance between ray origen and sphere center
+	float squareDistanceX = ((center.x - ray.origin.x) * (center.x - ray.origin.x));
+	float squareDistanceY = ((center.y - ray.origin.y) * (center.y - ray.origin.y));
+	float squareDistanceZ = ((center.z - ray.origin.z) * (center.z - ray.origin.z));
+
+	float squareDistance = squareDistanceX + squareDistanceY + squareDistanceZ;
+
+	//compare square distance with square sphere radius
+	float squareRadius = radius * radius;
+	
+	if (squareDistance == squareRadius) {
+		//ray origen on the sphere surface
+		return false;
 	}
-	else { // center of sphere projects on the ray
-		if ((sphereCenter - pc).length() > radius) { // there is no intersection
+
+	float Bx = ray.direction.x * (center.x - ray.origin.x);
+	float By = ray.direction.y * (center.y - ray.origin.y);
+	float Bz = ray.direction.z * (center.z - ray.origin.z);
+
+	float B = Bx + By + Bz;
+
+	if (squareDistance > squareRadius) {
+		if (B < 0)
 			return false;
-		}
-		else {
-			float temp = (pc - sphereCenter).length();
-			float dist = sqrt(radius * radius - temp * temp);
-			if (vpc.length() > radius) { // origin is outside sphere	
-				distance = (pc - ray.origin).length() - dist;
-			}
-			else { // origin is inside sphere
-				distance = (pc - ray.origin).length() + dist;
-			}
-			hitpoint = ray.origin + ray.direction * distance;
-			normal = (hitpoint - sphereCenter).normalize();
-		}
 	}
-	return false;
+
+	float R = (B * B) - squareDistance + squareRadius;
+
+	if (R < 0)
+		return false;
+
+	float t = 0.0f;
+	if (squareDistance > squareRadius) {
+		t = B - sqrt(R);
+	}
+	else if (squareDistance < squareRadius) {
+		t = B + sqrt(R);
+	}
+	
+	//Calculate intersection point
+	hitpoint.x = ray.origin.x + ray.direction.x * t;
+	hitpoint.y = ray.origin.y + ray.direction.y * t;
+	hitpoint.z = ray.origin.z + ray.direction.z * t;
+
+	//Calculate normal at hitpoint on sphere surface 
+	normal.x = (hitpoint.x - center.x) / radius;
+	normal.y = (hitpoint.y - center.y) / radius;
+	normal.z = (hitpoint.z - center.z) / radius;
+
+	normal = normal.normalize();
+
+	return true;
+
 }
