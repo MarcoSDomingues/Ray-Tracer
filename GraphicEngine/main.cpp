@@ -45,7 +45,7 @@ Scene* scene = NULL;
 int RES_X, RES_Y;
 
 /* Draw Mode: 0 - point by point; 1 - line by line; 2 - full frame */
-int draw_mode=1;
+int draw_mode=2;
 
 int WindowHandle = 0;
 
@@ -149,9 +149,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 					}
 				}
 
-				color.r += fs * ( ((light.r * mat.kd * (n.dot(L)))) + (light.r * mat.ks * (R.dot(L))));
-				color.g += fs * ( ((light.g * mat.kd * (n.dot(L)))) + (light.g * mat.ks * (R.dot(L))));
-				color.b += fs * ( ((light.b * mat.kd * (n.dot(L)))) + (light.b * mat.ks * (R.dot(L))));
+				color.r += fs * ( ((light.r * (mat.kd * mat.r) * (n.dot(L)))) + (light.r * (mat.ks * mat.r) * (R.dot(V))));
+				color.g += fs * ( ((light.g * (mat.kd * mat.g) * (n.dot(L)))) + (light.g * (mat.ks * mat.g) * (R.dot(V))));
+				color.b += fs * ( ((light.b * (mat.kd * mat.b) * (n.dot(L)))) + (light.b *(mat.ks * mat.b) * (R.dot(V))));
 			}
 			
 		}
