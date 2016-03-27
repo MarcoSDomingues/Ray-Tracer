@@ -54,9 +54,9 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 	hitpoint.z = ray.origin.z + ray.direction.z * t;
 
 	//Calculate normal at hitpoint on sphere surface 
-	normal.x = (hitpoint.x - center.x) / radius;
-	normal.y = (hitpoint.y - center.y) / radius;
-	normal.z = (hitpoint.z - center.z) / radius;
+	normal.x = (hitpoint.x - center.x);
+	normal.y = (hitpoint.y - center.y);
+	normal.z = (hitpoint.z - center.z);
 
 	normal = normal.normalize();
 

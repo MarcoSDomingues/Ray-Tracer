@@ -1,8 +1,19 @@
-﻿Build started 27/03/2016 04:00:23.
+﻿Build started 27/03/2016 23:58:15.
      1>Project "\\vmware-host\Shared Folders\Desktop\Ray-Tracer\GraphicEngine\GraphicEngine.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt Plane.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt GeometricObject.cpp Plane.cpp Scene.cpp Sphere.cpp main.cpp
+         main.cpp
+         Generating Code...
+         Compiling...
+         Sphere.cpp
+         Scene.cpp
+     1>\\vmware-host\shared folders\desktop\ray-tracer\graphicengine\scene.cpp(106): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+     1>\\vmware-host\shared folders\desktop\ray-tracer\graphicengine\scene.cpp(107): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+     1>\\vmware-host\shared folders\desktop\ray-tracer\graphicengine\scene.cpp(117): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
          Plane.cpp
+         Generating Code...
+         Skipping... (no relevant changes detected)
+         GeometricObject.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"\\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.exe" /INCREMENTAL /NOLOGO /LIBPATH:Dependencies\freeglut /LIBPATH:Dependencies\glew opengl32.lib freeglut.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"\\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"\\vmware-host\Shared Folders\Desktop\Ray-Tracer\x64\Debug\GraphicEngine.lib" /MACHINE:X64 x64\Debug\GeometricObject.obj
          x64\Debug\main.obj
@@ -14,4 +25,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.07
+Time Elapsed 00:00:06.23

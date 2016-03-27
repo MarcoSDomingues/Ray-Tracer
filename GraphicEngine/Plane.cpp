@@ -4,7 +4,7 @@ bool Plane::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance
 	Vector3 a = Vector3(p1.x, p1.y, p1.z);
 	Vector3 b = Vector3(p2.x, p2.y, p2.z);
 	Vector3 c = Vector3(p3.x, p3.y, p3.z);
-	normal = ((a - c).cross(a - b)).normalize();
+	normal = ((c - a).cross(b - a)).normalize();
 
 	float aux = normal.dot(ray.direction);
 	
