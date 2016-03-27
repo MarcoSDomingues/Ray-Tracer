@@ -45,7 +45,7 @@ Scene* scene = NULL;
 int RES_X, RES_Y;
 
 /* Draw Mode: 0 - point by point; 1 - line by line; 2 - full frame */
-int draw_mode=2;
+int draw_mode=1;
 
 int WindowHandle = 0;
 
