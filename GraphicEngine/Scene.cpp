@@ -65,7 +65,8 @@ void Scene::parseSphere(std::stringstream& sin) {
 
 void Scene::parseLine(std::stringstream& sin) {
 	std::string s;
-	sin >> s;
+	if (verticesCount <= 0)
+		sin >> s;
 	if (s.compare("b") == 0) parseBackground(sin);
 	else if (s.compare("from") == 0) parseFrom(sin);
 	else if (s.compare("at") == 0) parseAt(sin);
@@ -78,6 +79,24 @@ void Scene::parseLine(std::stringstream& sin) {
 	else if (s.compare("f") == 0) parseMaterial(sin);
 	else if (s.compare("pl") == 0) parsePlane(sin);
 	else if (s.compare("s") == 0) parseSphere(sin);
+	else if (s.compare("p") == 0) {
+
+		sin >> verticesCount;
+		Poly *poly = new Poly(mat);
+		polys.push_back(poly);
+		polyID++;
+	}
+
+	else if (verticesCount > 0) {
+		Vector3 vertex;
+		sin >> vertex.x >> vertex.y >> vertex.z;
+		polys[polyID]->vertices.push_back(vertex);
+
+		if (verticesCount == 1)
+			objects.push_back(polys[polyID]);
+		
+		verticesCount--;
+	}
 }
 
 const void Scene::parseFile(std::string& filename) {

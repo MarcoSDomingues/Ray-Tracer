@@ -151,12 +151,14 @@
     <ClCompile Include="GeometricObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Poly.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeometricObject.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Poly.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Utils.h" />

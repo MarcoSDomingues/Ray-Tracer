@@ -9,6 +9,7 @@
 #include "Dependencies/freeglut/freeglut.h"
 
 #include "GeometricObject.h"
+#include "Poly.h"
 #include "Sphere.h"
 #include "Plane.h"
 #include "Utils.h"
@@ -22,6 +23,11 @@ public:
 	Camera camera;
 
 	Material mat;
+
+	std::vector<Poly*> polys;
+	int verticesCount = -1;
+	int polyID = -1;
+
 
 	std::vector<Light> lights;
 	std::vector<GeometricObject*> objects;

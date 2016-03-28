@@ -424,6 +424,7 @@ void init(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
 	scene = new Scene(std::string("NFF/testFile.nff"));
+
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;
     
