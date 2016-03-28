@@ -7,6 +7,8 @@
 #include "Utils.h"
 #include "Vectors.h"
 
+#define EPS 0.0001
+
 class Poly : public GeometricObject {
 
 public:
