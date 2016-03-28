@@ -60,16 +60,19 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	bool has_collision = false;
 
 	float distance = 0.0f;
+	Vector3 normal;
+	Vector3 normalHitPoint;
 
     //intersect ray with all objects
 	float maxDistance = -1;
 	for (int i = 0; i < scene->objects.size(); i++) {
-		if (scene->objects[i]->checkIntersection(ray, hit, distance)) {
+		if (scene->objects[i]->checkIntersection(ray, hit, distance, normal)) {
 			if (distance <= maxDistance || maxDistance == -1) {
 				maxDistance = distance;
 				hitPoint = hit;
 				has_collision = true;
 				objID = i;
+				normalHitPoint = normal;
 			}
 		}
 	}
@@ -83,10 +86,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	else {
 
 		//compute normal at hitpoint
-		
-		Vector3 normal;
-
-		normal = scene->objects[objID]->normal;
 
 		Material mat = scene->objects[objID]->material;
 
@@ -99,7 +98,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 lightPos = Vector3(light.x, light.y, light.z);
 
 			Vector3 L = (lightPos - hitPoint).normalize();
-			Vector3 n = normal.normalize();
+			Vector3 n = normalHitPoint.normalize();
 			Vector3 Ln = (L.dot(n) * n);
 			Vector3 V = (scene->camera.eye - hitPoint).normalize();
 			
@@ -118,7 +117,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				for (int k = 0; k < scene->objects.size(); k++) {
 					if (k > objID) {
-						if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, dist)) {
+						if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, dist, normal)) {
 							//if (dist < lightDistance) 
 							//we have to do something here
 								fs = 0.0f;
