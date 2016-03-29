@@ -55,6 +55,8 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
 	Color color;
 
+	bool reflectiveObject = true;
+
 	int objID = 0;
 	Vector3 hitPoint, hit;
 	bool has_collision = false;
@@ -85,16 +87,19 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	}
 	else {
 
-		//compute normal at hitpoint
-
 		Material mat = scene->objects[objID]->material;
 
 		color.r = mat.r * mat.kd;
 		color.g = mat.g * mat.kd;	
 		color.b = mat.b * mat.kd;
 
+		//compute normal at hitpoint
 		Vector3 n = normalHitPoint.normalize();
 		Vector3 V = (scene->camera.eye - hitPoint).normalize();
+
+		Vector3 D = -ray.direction;
+		Vector3 Ci = n * (D.dot(n));
+		Vector3 Si = Ci + ray.direction;
 
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Light light = scene->lights[i];
@@ -107,8 +112,8 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 R = Ln + h;
 
 			Vector3 Rr = 2 * (L.dot(n)) * n - L;
-			Vector3 Vt = V.dot(n)*n - V;
-			Vector3 Rt = sin(0.04)*(1 / (Vt).length())*Vt + cos(0.04)*-n;
+			//Vector3 Vt = V.dot(n)*n - V;
+			//Vector3 Rt = sin(0.04)*(1 / (Vt).length())*Vt + cos(0.04)*-n;
 
 			Ray shadowFeeler;
 			shadowFeeler.origin = hitPoint;
@@ -129,36 +134,43 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 						}
 					}
 				}
-				 
-				color.r += fs * ((light.r * (mat.r * mat.kd/3) * n.dot(L)) + (light.r * (mat.r * mat.ks/3) * R.dot(V)));
-				color.g += fs * ((light.g * (mat.g * mat.kd/3) * n.dot(L)) + (light.g * (mat.g * mat.ks/3) * R.dot(V)));
-				color.b += fs * ((light.b * (mat.b * mat.kd/3) * n.dot(L)) + (light.b * (mat.b * mat.ks/3) * R.dot(V)));
 
+				color.r += fs * ((light.r * (mat.r * mat.kd) * n.dot(L)) + (light.r * (mat.r * mat.ks) * R.dot(V)));
+				color.g += fs * ((light.g * (mat.g * mat.kd) * n.dot(L)) + (light.g * (mat.g * mat.ks) * R.dot(V)));
+				color.b += fs * ((light.b * (mat.b * mat.kd) * n.dot(L)) + (light.b * (mat.b * mat.ks) * R.dot(V)));
 			}
 		}
 
 		if (depth >= MAX_DEPTH)	return color;
 
-		//if(refelctive object){
-		Vector3 Rr = 2 * (V.dot(n)) * n - V;
-		Ray reflectedRay;
-		reflectedRay.origin = hitPoint;
-		reflectedRay.direction = Rr;
-		Color rColor = rayTracing(reflectedRay, depth + 1, 1.0f);
-		color.r += rColor.r * mat.ks/3;
-		color.g += rColor.g * mat.ks/3;
-		color.b += rColor.b * mat.ks/3;
+		if (mat.ks > 0.0) {
+			//compute input cosine and sine vectors
 
-		//if(translucid object) {
-		/*Vector3 Vt = V.dot(n)*n - V;
-		Vector3 Rt = sin(mat.iof)*(1 / (Vt).length())*Vt + cos(0.04)*-n;
-		Ray refractedRay;
-		refractedRay.origin = hitPoint;
-		refractedRay.direction = Rt;
-		Color tColor = rayTracing(refractedRay, depth + 1, 1.0f);
-		color.r += tColor.r * mat.t/3;
-		color.g += tColor.r * mat.t/3;
-		color.b += tColor.r * mat.t/3;*/
+			Ray reflectedRay;
+			reflectedRay.origin = hitPoint;
+			reflectedRay.direction = Ci + Si;
+
+			Color rColor = rayTracing(reflectedRay, depth + 1, 1.0f);
+			color.r += rColor.r * mat.ks;
+			color.g += rColor.g * mat.ks;
+			color.b += rColor.b * mat.ks;
+		}
+
+		if (mat.t > 0.0) {
+			//compute output cosine and sine vectors
+			Vector3 St = (RefrIndex / mat.iof) * Si;
+			float aux = pow((1 - St.dot(St)), 0.5);
+			Vector3 Ct = -n * aux;
+
+			Ray refractedRay;
+			refractedRay.origin = hitPoint;
+			refractedRay.direction = Ct + St;
+
+			Color tColor = rayTracing(refractedRay, depth + 1, 1.0f);
+			color.r += tColor.r * mat.t;
+			color.g += tColor.g * mat.t;
+			color.b += tColor.b * mat.t;
+		}
 
 		return color;
 
@@ -450,7 +462,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/testFile.nff"));
+	scene = new Scene(std::string("NFF/mount_low.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

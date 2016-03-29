@@ -7,10 +7,10 @@ bool Plane::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance
 	normal = ((c - a).cross(b - a)).normalize();
 
 	float aux = normal.dot(ray.direction);
-	
-	if (aux == 0)
+
+	if (aux == 0) {
 		return false;
-	
+	}
 	distance = (a - ray.origin).length();
 
 	float t = -((normal.dot(ray.origin) + distance) / aux);

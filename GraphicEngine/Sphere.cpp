@@ -18,11 +18,6 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 
 	//compare square distance with square sphere radius
 	float squareRadius = radius * radius;
-	
-	if (squareDistance == squareRadius) {
-		//ray origen on the sphere surface
-		return false;
-	}
 
 	float Bx = ray.direction.x * (center.x - ray.origin.x);
 	float By = ray.direction.y * (center.y - ray.origin.y);
@@ -31,14 +26,16 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 	float B = Bx + By + Bz;
 
 	if (squareDistance > squareRadius) {
-		if (B < 0)
+		if (B < 0) {
 			return false;
+		}
 	}
 
 	float R = (B * B) - squareDistance + squareRadius;
 
-	if (R < 0)
+	if (R < 0) {
 		return false;
+	}
 
 	float t = 0.0f;
 	if (squareDistance > squareRadius) {
@@ -57,6 +54,8 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 	normal.x = (hitpoint.x - center.x);
 	normal.y = (hitpoint.y - center.y);
 	normal.z = (hitpoint.z - center.z);
+
+	//distance = (ray.origin - hitpoint).length();
 
 	normal = normal.normalize();
 
