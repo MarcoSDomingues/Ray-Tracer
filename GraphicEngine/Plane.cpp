@@ -15,8 +15,8 @@ bool Plane::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance
 	if (aux == 0.0f) {
 		return false;
 	}
-	//Vector3 origin = Vector3(0.0f, 0.0f, 0.0f);
-	distance = (a - ray.origin).length();
+	Vector3 origin = Vector3(0.0f, 0.0f, 0.0f);
+	distance = (a - origin).length();
 
 	float t = -((normal.dot(ray.origin) + distance) / aux);
 

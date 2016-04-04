@@ -91,9 +91,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 		Material mat = scene->objects[objID]->material;
 
-		color.r = mat.r * mat.kd;
-		color.g = mat.g * mat.kd;
-		color.b = mat.b * mat.kd;
+		color.r = 0.0f;
+		color.g = 0.0f;
+		color.b = 0.0f;
 
 		//compute normal at hitpoint
 		Vector3 n = normalHitPoint;
