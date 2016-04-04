@@ -24,7 +24,7 @@
 #define VERTEX_COORD_ATTRIB 0
 #define COLOR_ATTRIB 1
 
-#define DELTA 2.5
+#define DELTA 0.5
 #define MAX_DEPTH 6
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
@@ -117,7 +117,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 			float fs = 1.0f;
 
-			if (L.dot(n) > 0) {
+			if (L.dot(n) > 0.0) {
 				Ray shadowFeeler;
 				shadowFeeler.origin = hitPoint;
 				shadowFeeler.direction = L;
@@ -147,14 +147,14 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 		if (depth >= MAX_DEPTH)	return color;
 
-		if (mat.ks > 0.0) {
+		if (mat.ks >= 0.0) {
 			//compute input cosine and sine vectors
 
 			Ray reflectedRay;
-			reflectedRay.origin = hitPoint;
+			reflectedRay.origin = hitPoint * DELTA;
 			reflectedRay.direction = Ci + Si;
 
-			Color rColor = rayTracing(reflectedRay, depth + 1, 1.0f);
+			Color rColor = rayTracing(reflectedRay, depth + 1, 1.0);
 			color.r += rColor.r * mat.ks;
 			color.g += rColor.g * mat.ks;
 			color.b += rColor.b * mat.ks;
@@ -167,10 +167,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 Ct = -n * aux;
 
 			Ray refractedRay;
-			refractedRay.origin = hitPoint;
+			refractedRay.origin = hitPoint * DELTA;
 			refractedRay.direction = Ct + St;
 
-			Color tColor = rayTracing(refractedRay, depth + 1, 1.0f);
+			Color tColor = rayTracing(refractedRay, depth + 1, 1.0);
 			color.r += tColor.r * mat.t;
 			color.g += tColor.g * mat.t;
 			color.b += tColor.b * mat.t;
