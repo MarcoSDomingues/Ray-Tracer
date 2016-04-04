@@ -99,9 +99,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		Vector3 n = normalHitPoint;
 		Vector3 V = (scene->camera.eye - hitPoint).normalize();
 
-		//Vector3 D = -ray.direction;
-		//Vector3 Ci = n * (D.dot(n));
-		//Vector3 Si = Ci + ray.direction;
+		Vector3 D = -ray.direction;
+		Vector3 Ci = n * (D.dot(n));
+		Vector3 Si = Ci + ray.direction;
 
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Light light = scene->lights[i];
@@ -146,6 +146,35 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		}
 
 		if (depth >= MAX_DEPTH)	return color;
+
+		if (mat.ks > 0.0) {
+			//compute input cosine and sine vectors
+
+			Ray reflectedRay;
+			reflectedRay.origin = hitPoint;
+			reflectedRay.direction = Ci + Si;
+
+			Color rColor = rayTracing(reflectedRay, depth + 1, 1.0f);
+			color.r += rColor.r * mat.ks;
+			color.g += rColor.g * mat.ks;
+			color.b += rColor.b * mat.ks;
+		}
+
+		if (mat.t > 0.0) {
+			//compute output cosine and sine vectors
+			Vector3 St = (RefrIndex / mat.iof) * Si;
+			float aux = pow((1 - St.dot(St)), 0.5);
+			Vector3 Ct = -n * aux;
+
+			Ray refractedRay;
+			refractedRay.origin = hitPoint;
+			refractedRay.direction = Ct + St;
+
+			Color tColor = rayTracing(refractedRay, depth + 1, 1.0f);
+			color.r += tColor.r * mat.t;
+			color.g += tColor.g * mat.t;
+			color.b += tColor.b * mat.t;
+		}
 
 		return color;
 
