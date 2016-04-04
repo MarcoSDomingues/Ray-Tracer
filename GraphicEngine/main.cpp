@@ -24,6 +24,7 @@
 #define VERTEX_COORD_ATTRIB 0
 #define COLOR_ATTRIB 1
 
+#define DELTA 2.5
 #define MAX_DEPTH 6
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
@@ -65,6 +66,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 normal;
 	Vector3 normalHitPoint;
 
+	//std::cout << ray.direction.x << " " << ray.direction.y << "  " << ray.direction.z << std::endl;
     //intersect ray with all objects
 	float maxDistance = -1;
 	for (int i = 0; i < scene->objects.size(); i++) {
@@ -90,16 +92,16 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		Material mat = scene->objects[objID]->material;
 
 		color.r = mat.r * mat.kd;
-		color.g = mat.g * mat.kd;	
+		color.g = mat.g * mat.kd;
 		color.b = mat.b * mat.kd;
 
 		//compute normal at hitpoint
-		Vector3 n = normalHitPoint.normalize();
+		Vector3 n = normalHitPoint;
 		Vector3 V = (scene->camera.eye - hitPoint).normalize();
 
-		Vector3 D = -ray.direction;
-		Vector3 Ci = n * (D.dot(n));
-		Vector3 Si = Ci + ray.direction;
+		//Vector3 D = -ray.direction;
+		//Vector3 Ci = n * (D.dot(n));
+		//Vector3 Si = Ci + ray.direction;
 
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Light light = scene->lights[i];
@@ -111,66 +113,39 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 h = Ln - L;
 			Vector3 R = Ln + h;
 
-			Vector3 Rr = 2 * (L.dot(n)) * n - L;
-			//Vector3 Vt = V.dot(n)*n - V;
-			//Vector3 Rt = sin(0.04)*(1 / (Vt).length())*Vt + cos(0.04)*-n;
+			bool in_dark = false;
 
-			Ray shadowFeeler;
-			shadowFeeler.origin = hitPoint;
-			shadowFeeler.direction = L;
+			float fs = 1.0f;
 
 			if (L.dot(n) > 0) {
-				float fs = 1.0f;
+				Ray shadowFeeler;
+				shadowFeeler.origin = hitPoint;
+				shadowFeeler.direction = L;
+
+
 				Vector3 hitShadow;
 				float dist;
-				float lightDistance = (lightPos - hitPoint).length();
 
 				for (int k = 0; k < scene->objects.size(); k++) {
-					if (k > objID) {
+					if (k != objID) {
 						if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, dist, normal)) {
-							//if (dist < lightDistance) 
-							//we have to do something here
-							fs = 0.0f;
+							in_dark = true;
 						}
 					}
 				}
 
-				color.r += fs * ((light.r * (mat.r * mat.kd) * n.dot(L)) + (light.r * (mat.r * mat.ks) * R.dot(V)));
-				color.g += fs * ((light.g * (mat.g * mat.kd) * n.dot(L)) + (light.g * (mat.g * mat.ks) * R.dot(V)));
-				color.b += fs * ((light.b * (mat.b * mat.kd) * n.dot(L)) + (light.b * (mat.b * mat.ks) * R.dot(V)));
+				if (in_dark) fs = 0.0f;
+
+				color.r += fs * ((light.r * (mat.r * mat.kd) * n.dot(L)) + (light.r * (mat.r * mat.ks) * h.dot(n)));
+				color.g += fs * ((light.g * (mat.g * mat.kd) * n.dot(L)) + (light.g * (mat.g * mat.ks) * h.dot(n)));
+				color.b += fs * ((light.b * (mat.b * mat.kd) * n.dot(L)) + (light.b * (mat.b * mat.ks) * h.dot(n)));
+
+				in_dark = false;
 			}
+			
 		}
 
 		if (depth >= MAX_DEPTH)	return color;
-
-		if (mat.ks > 0.0) {
-			//compute input cosine and sine vectors
-
-			Ray reflectedRay;
-			reflectedRay.origin = hitPoint;
-			reflectedRay.direction = Ci + Si;
-
-			Color rColor = rayTracing(reflectedRay, depth + 1, 1.0f);
-			color.r += rColor.r * mat.ks;
-			color.g += rColor.g * mat.ks;
-			color.b += rColor.b * mat.ks;
-		}
-
-		if (mat.t > 0.0) {
-			//compute output cosine and sine vectors
-			Vector3 St = (RefrIndex / mat.iof) * Si;
-			float aux = pow((1 - St.dot(St)), 0.5);
-			Vector3 Ct = -n * aux;
-
-			Ray refractedRay;
-			refractedRay.origin = hitPoint;
-			refractedRay.direction = Ct + St;
-
-			Color tColor = rayTracing(refractedRay, depth + 1, 1.0f);
-			color.r += tColor.r * mat.t;
-			color.g += tColor.g * mat.t;
-			color.b += tColor.b * mat.t;
-		}
 
 		return color;
 
@@ -462,7 +437,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/mount_low.nff"));
+	scene = new Scene(std::string("NFF/testFile.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;
