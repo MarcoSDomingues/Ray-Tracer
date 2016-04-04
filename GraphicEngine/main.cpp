@@ -24,7 +24,7 @@
 #define VERTEX_COORD_ATTRIB 0
 #define COLOR_ATTRIB 1
 
-#define DELTA 0.5
+#define DELTA 1.0001
 #define MAX_DEPTH 6
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
@@ -99,10 +99,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		Vector3 n = normalHitPoint;
 		Vector3 V = (scene->camera.eye - hitPoint).normalize();
 
-		Vector3 D = -ray.direction;
-		Vector3 Ci = n * (D.dot(n));
-		Vector3 Si = Ci + ray.direction;
-
 		for (int i = 0; i < scene->lights.size(); i++) {
 			Light light = scene->lights[i];
 			Vector3 lightPos = Vector3(light.x, light.y, light.z);
@@ -147,12 +143,13 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 		if (depth >= MAX_DEPTH)	return color;
 
-		if (mat.ks >= 0.0) {
+		if (mat.ks > 0.0) {
 			//compute input cosine and sine vectors
+			Vector3 Rr = 2 * (V.dot(n)) * n - V;
 
 			Ray reflectedRay;
 			reflectedRay.origin = hitPoint * DELTA;
-			reflectedRay.direction = Ci + Si;
+			reflectedRay.direction = Rr;
 
 			Color rColor = rayTracing(reflectedRay, depth + 1, 1.0);
 			color.r += rColor.r * mat.ks;
@@ -161,14 +158,19 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		}
 
 		if (mat.t > 0.0) {
-			//compute output cosine and sine vectors
-			Vector3 St = (RefrIndex / mat.iof) * Si;
-			float aux = pow((1 - St.dot(St)), 0.5);
-			Vector3 Ct = -n * aux;
+			Vector3 Vt = V.dot(n)*n - V;
+			float sinI = Vt.length();
+			float sinT = (RefrIndex / mat.iof) * sinI;
+
+			float cosT = sqrt(1 - pow(sinT, 2));
+
+			Vector3 t = (Vt / sinI).normalize();
+
+			Vector3 Rt = sinT * t + cosT * -n;
 
 			Ray refractedRay;
 			refractedRay.origin = hitPoint * DELTA;
-			refractedRay.direction = Ct + St;
+			refractedRay.direction = Rt;
 
 			Color tColor = rayTracing(refractedRay, depth + 1, 1.0);
 			color.r += tColor.r * mat.t;
@@ -177,7 +179,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		}
 
 		return color;
-
 	}
 }
 
@@ -466,7 +467,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/testFile.nff"));
+	scene = new Scene(std::string("NFF/mount_low.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;
