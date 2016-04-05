@@ -25,6 +25,7 @@
 #define COLOR_ATTRIB 1
 
 #define DELTA 1.0001
+#define THRESH 0.3
 #define MAX_DEPTH 6
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
@@ -334,6 +335,57 @@ void drawPoints()
 
 // Render function by primary ray casting from the eye towards the scene's objects
 
+Color averageColor(Color c1, Color c2, Color c3, Color c4) {
+	Color color;
+	color.r = (c1.r + c2.r + c3.r + c4.r) / 4;
+	color.g = (c1.g + c2.g + c3.g + c4.g) / 4;
+	color.b = (c1.b + c2.b + c3.b + c4.b) / 4;
+	return color;
+}
+
+
+bool compareColors(Color c1, Color c2) {
+	if ((c1.r - c2.r) < THRESH || (c2.r - c1.r < THRESH)) {
+		if ((c1.g - c2.g) < THRESH || (c2.g - c1.g < THRESH)) {
+			if ((c1.b - c2.b) < THRESH || (c2.b - c1.b < THRESH)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+Color adaptativeSuperSampling(int x, int y, int n) {
+
+	Ray ray;
+	Color color[4];
+
+	//monteCarlo
+	ray = scene->camGetPrimaryRay(x, y);
+	color[0] = rayTracing(ray, 1, 1.0);
+
+	ray = scene->camGetPrimaryRay(x + 1, y);
+	color[1] = rayTracing(ray, 1, 1.0);
+
+	ray = scene->camGetPrimaryRay(x + 1, y + 1);
+	color[2] = rayTracing(ray, 1, 1.0);
+
+	ray = scene->camGetPrimaryRay(x, y + 1);
+	color[3] = rayTracing(ray, 1, 1.0);
+
+	if (compareColors(color[0], color[1])) {
+		if (compareColors(color[2], color[3])) {
+			if (compareColors(color[0], color[2]))
+				return averageColor(color[0], color[1], color[2], color[3]);
+		}
+	}
+
+	else {
+		return color[0];
+	}
+
+}
+
 void renderScene()
 {
     int index_pos=0;
@@ -346,10 +398,15 @@ void renderScene()
     {
         for (int x = 0; x < RES_X; x++)
         {
-            
+
+			
+
             //YOUR 2 FUNTIONS:
-            ray = scene->camGetPrimaryRay(x, y);
-            color = rayTracing(ray, 1, 1.0 );
+            
+			color = adaptativeSuperSampling(x, y, 0);
+			/*ray = scene->camGetPrimaryRay(x, y);
+			color = rayTracing(ray, 1, 1.0);*/
+
             
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
@@ -467,7 +524,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/mount_low.nff"));
+	scene = new Scene(std::string("NFF/balls_low.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;
