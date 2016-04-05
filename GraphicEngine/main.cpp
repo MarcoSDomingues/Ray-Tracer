@@ -360,17 +360,19 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	Ray ray;
 	Color color[4];
 
+	float delta = 1.0f / (n + 1);
+
 	//monteCarlo
 	ray = scene->camGetPrimaryRay(x, y);
 	color[0] = rayTracing(ray, 1, 1.0);
 
-	ray = scene->camGetPrimaryRay(x + 1, y);
+	ray = scene->camGetPrimaryRay(x + delta, y);
 	color[1] = rayTracing(ray, 1, 1.0);
 
-	ray = scene->camGetPrimaryRay(x + 1, y + 1);
+	ray = scene->camGetPrimaryRay(x + delta, y + delta);
 	color[2] = rayTracing(ray, 1, 1.0);
 
-	ray = scene->camGetPrimaryRay(x, y + 1);
+	ray = scene->camGetPrimaryRay(x, y + delta);
 	color[3] = rayTracing(ray, 1, 1.0);
 
 	if (compareColors(color[0], color[1])) {
@@ -381,7 +383,11 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	}
 
 	else {
-		return color[0];
+		n++;
+		if (n == 3) {
+			return averageColor(color[0], color[1], color[2], color[3]);
+		}
+		return adaptativeSuperSampling(x, y, n);
 	}
 
 }
