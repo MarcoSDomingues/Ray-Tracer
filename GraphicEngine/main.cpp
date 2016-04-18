@@ -341,16 +341,16 @@ void drawPoints()
 
 Color averageColor(Color c1, Color c2, Color c3, Color c4) {
 	Color color;
-	color.r = (c1.r + c2.r + c3.r + c4.r) / 4;
-	color.g = (c1.g + c2.g + c3.g + c4.g) / 4;
-	color.b = (c1.b + c2.b + c3.b + c4.b) / 4;
+	color.r = (c1.r + c2.r + c3.r + c4.r) / 4.0f;
+	color.g = (c1.g + c2.g + c3.g + c4.g) / 4.0f;
+	color.b = (c1.b + c2.b + c3.b + c4.b) / 4.0f;
 	return color;
 }
 
 
 bool compareColors(Color c1, Color c2) {
 	float diff = std::abs(c1.r - c2.r) + std::abs(c1.g - c2.g) + std::abs(c1.b - c2.b);
-	if (diff < 0.3) {
+	if (diff < 3.0f) {
 		return true;
 	}
 	return false;
@@ -363,7 +363,7 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	Ray ray;
 	Color color[4];
 
-	float delta = 1.0f / (n + 1);
+	float delta = 1.0f / (n + 1.0f);
 
 	//monteCarlo
 	ray = scene->camGetPrimaryRay(x, y);
@@ -397,7 +397,7 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 		return averageColor(color[0], color[1], color[2], color[3]);
 	}
 
-	float nextDelta = 1.0f / (n + 1);
+	float nextDelta = 1 / (n + 1);
 	color[0] = adaptativeSuperSampling(x, y, n);
 	color[1] = adaptativeSuperSampling(x + nextDelta, y, n);
 	color[2] = adaptativeSuperSampling(x, y+ nextDelta, n);
