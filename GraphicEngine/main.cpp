@@ -11,6 +11,7 @@
 #include <string>
 #include <stdio.h>
 #include <limits>
+#include <cmath> 
 
 #include "Dependencies/glew/glew.h"
 #include "Dependencies/freeglut/freeglut.h"
@@ -50,6 +51,9 @@ int RES_X, RES_Y;
 int draw_mode=1;
 
 int WindowHandle = 0;
+
+Ray firstIt[3];
+Ray secondIt[4];
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
@@ -345,15 +349,14 @@ Color averageColor(Color c1, Color c2, Color c3, Color c4) {
 
 
 bool compareColors(Color c1, Color c2) {
-	if ((c1.r - c2.r) < THRESH || (c2.r - c1.r < THRESH)) {
-		if ((c1.g - c2.g) < THRESH || (c2.g - c1.g < THRESH)) {
-			if ((c1.b - c2.b) < THRESH || (c2.b - c1.b < THRESH)) {
-				return true;
-			}
-		}
+	float diff = std::abs(c1.r - c2.r) + std::abs(c1.g - c2.g) + std::abs(c1.b - c2.b);
+	if (diff < 0.3) {
+		return true;
 	}
 	return false;
 }
+
+int auxN = 0; 
 
 Color adaptativeSuperSampling(int x, int y, int n) {
 
@@ -382,13 +385,24 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 		}
 	}
 
-	else {
-		n++;
-		if (n == 3) {
-			return averageColor(color[0], color[1], color[2], color[3]);
-		}
-		return adaptativeSuperSampling(x, y, n);
+	n++;
+
+	if (auxN != n) { //para debug
+		auxN = n;
+		std::cout << n << std::endl;
 	}
+
+	if (n == 3) {
+		std::cout << "fim\n";
+		return averageColor(color[0], color[1], color[2], color[3]);
+	}
+
+	float nextDelta = 1.0f / (n + 1);
+	color[0] = adaptativeSuperSampling(x, y, n);
+	color[1] = adaptativeSuperSampling(x + nextDelta, y, n);
+	color[2] = adaptativeSuperSampling(x, y+ nextDelta, n);
+	color[3] = adaptativeSuperSampling(x + nextDelta, y + nextDelta, n);
+	return averageColor(color[0], color[1], color[2], color[3]);
 
 }
 
@@ -404,8 +418,6 @@ void renderScene()
     {
         for (int x = 0; x < RES_X; x++)
         {
-
-			
 
             //YOUR 2 FUNTIONS:
             
