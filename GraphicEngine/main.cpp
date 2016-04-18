@@ -28,6 +28,9 @@
 #define DELTA 1.0001
 #define THRESH 0.3
 #define MAX_DEPTH 6
+#define SHADOW_MAX_RAYS 25
+
+Color shadowColor;
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
 float *colors;
@@ -56,6 +59,12 @@ Ray firstIt[3];
 Ray secondIt[4];
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
+
+float randomNumber() {
+	float r = rand() % 10;
+	float random = r / (r + 2);
+	return roundf(random * 10) / 10;
+}
 
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
@@ -100,6 +109,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		color.g = 0.0f;
 		color.b = 0.0f;
 
+		shadowColor.r = 0.0f;
+		shadowColor.g = 0.0f;
+		shadowColor.b = 0.0f;
+
 		//compute normal at hitpoint
 		Vector3 n = normalHitPoint;
 		Vector3 V = (scene->camera.eye - hitPoint).normalize();
@@ -108,42 +121,53 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Light light = scene->lights[i];
 			Vector3 lightPos = Vector3(light.x, light.y, light.z);
 
-			Vector3 L = (lightPos - hitPoint).normalize();
-			Vector3 Ln = (L.dot(n) * n);
-			
-			Vector3 h = Ln - L;
-			Vector3 R = Ln + h;
+			Vector3 a = Vector3(1.0f, 0.0f, 0.0f);
+			Vector3 b = Vector3(0.0f, 1.0f, 0.0f);
 
-			bool in_dark = false;
+			for (int k = 0; k < SHADOW_MAX_RAYS; k++) {
+				float j = 0.1;
+				Vector3 LP = lightPos + (randomNumber() * a) + (randomNumber() * b);
 
-			float fs = 1.0f;
+				Vector3 L = (LP - hitPoint).normalize();
+				Vector3 Ln = (L.dot(n) * n);
 
-			if (L.dot(n) > 0.0) {
-				Ray shadowFeeler;
-				shadowFeeler.origin = hitPoint;
-				shadowFeeler.direction = L;
+				Vector3 h = Ln - L;
+				Vector3 R = Ln + h;
+
+				bool in_dark = false;
+
+				float fs = 1.0f;
+
+				if (L.dot(n) > 0.0) {
+					Ray shadowFeeler;
+					shadowFeeler.origin = hitPoint * DELTA;
+					shadowFeeler.direction = L;
 
 
-				Vector3 hitShadow;
-				float dist;
+					Vector3 hitShadow;
+					float dist;
 
-				for (int k = 0; k < scene->objects.size(); k++) {
-					if (k != objID) {
-						if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, dist, normal)) {
-							in_dark = true;
+					for (int k = 0; k < scene->objects.size(); k++) {
+						if (k != objID) {
+							if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, dist, normal)) {
+								in_dark = true;
+							}
 						}
 					}
+
+					if (in_dark) fs = 0.0f;
+
+					shadowColor.r += fs * ((light.r * (mat.r * mat.kd) * n.dot(L)) + (light.r * (mat.r * mat.ks) * h.dot(n)));
+					shadowColor.g += fs * ((light.g * (mat.g * mat.kd) * n.dot(L)) + (light.g * (mat.g * mat.ks) * h.dot(n)));
+					shadowColor.b += fs * ((light.b * (mat.b * mat.kd) * n.dot(L)) + (light.b * (mat.b * mat.ks) * h.dot(n)));
+
+					in_dark = false;
 				}
-
-				if (in_dark) fs = 0.0f;
-
-				color.r += fs * ((light.r * (mat.r * mat.kd) * n.dot(L)) + (light.r * (mat.r * mat.ks) * h.dot(n)));
-				color.g += fs * ((light.g * (mat.g * mat.kd) * n.dot(L)) + (light.g * (mat.g * mat.ks) * h.dot(n)));
-				color.b += fs * ((light.b * (mat.b * mat.kd) * n.dot(L)) + (light.b * (mat.b * mat.ks) * h.dot(n)));
-
-				in_dark = false;
 			}
-			
+
+			color.r = shadowColor.r / SHADOW_MAX_RAYS;
+			color.g = shadowColor.g / SHADOW_MAX_RAYS;
+			color.b = shadowColor.b / SHADOW_MAX_RAYS;
 		}
 
 		if (depth >= MAX_DEPTH)	return color;
@@ -422,8 +446,8 @@ void renderScene()
             //YOUR 2 FUNTIONS:
             
 			color = adaptativeSuperSampling(x, y, 0);
-			/*ray = scene->camGetPrimaryRay(x, y);
-			color = rayTracing(ray, 1, 1.0);*/
+			//ray = scene->camGetPrimaryRay(x, y);
+			//color = rayTracing(ray, 1, 1.0);
 
             
             vertices[index_pos++]= (float)x;
