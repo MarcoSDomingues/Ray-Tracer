@@ -11,7 +11,8 @@
 #include <string>
 #include <stdio.h>
 #include <limits>
-#include <cmath> 
+#include <cmath>
+#include <random>
 
 #include "Dependencies/glew/glew.h"
 #include "Dependencies/freeglut/freeglut.h"
@@ -19,6 +20,7 @@
 #include "Scene.h"
 #include "Vectors.h"
 #include "Utils.h"
+#include "DepthOfField.h"
 
 #define CAPTION "Ray Tracer"
 
@@ -29,6 +31,12 @@
 #define THRESH 0.3
 #define MAX_DEPTH 6
 #define SHADOW_MAX_RAYS 1
+
+//DEPTH OF FIELD CONSTANTS
+#define DEPTH_OF_FIELD 0 // Enable Depth of Field
+#define NUM_SAMPLES 16
+#define FOCAL_DISTANCE 2.0
+#define LENS_RADIUS 0.1
 
 Color shadowColor;
 
@@ -476,6 +484,83 @@ void renderScene()
     printf("Terminou!\n");
 }
 
+void depthOfFieldRenderScene() {
+	int index_pos = 0;
+	int index_col = 0;
+
+	DepthOfField *dof = new DepthOfField(scene->getDF(), FOCAL_DISTANCE, LENS_RADIUS, NUM_SAMPLES);
+
+	Color color;
+	Color auxColor;
+
+	Ray centralRay;
+
+	for (int y = 0; y < RES_Y; y++)
+	{
+		for (int x = 0; x < RES_X; x++)
+		{
+			centralRay = scene->camGetPrimaryRay(x, y);
+
+			float t = -dof->focalDistance / (scene->getZe().dot(centralRay.direction));
+			
+			Vector3 point = centralRay.origin + centralRay.direction * t;
+
+			Vector3 u = scene->getXe();
+			Vector3 v = scene->getYe();
+
+			color.r = 0.0f;
+			color.g = 0.0f;
+			color.b = 0.0f;
+
+			for (int i = 0; i < dof->numOfSamples; i++) {
+				
+				Vector2 dp = Vector2(randomNumber(), randomNumber());
+				Vector2 lp = Vector2(dp.x * dof->lensRadius, dp.y * dof->lensRadius);
+
+				Vector3 L = scene->camera.eye + lp.x * u + lp.y * v;
+
+				Ray primaryRay;
+				primaryRay.origin = L;
+				primaryRay.direction = (point - L).normalize();
+
+				auxColor = rayTracing(primaryRay, 1, 1.0f);
+				color.r += auxColor.r;
+				color.g += auxColor.g;
+				color.b += auxColor.b;
+			}
+
+			color.r = color.r * (1.0f / dof->numOfSamples);
+			color.g = color.g * (1.0f / dof->numOfSamples);
+			color.b = color.b * (1.0f / dof->numOfSamples);
+
+			vertices[index_pos++] = (float)x;
+			vertices[index_pos++] = (float)y;
+			colors[index_col++] = (float)color.r;
+			colors[index_col++] = (float)color.g;
+			colors[index_col++] = (float)color.b;
+
+			if (draw_mode == 0) {  // desenhar o conte˙do da janela ponto a ponto
+				drawPoints();
+				index_pos = 0;
+				index_col = 0;
+			}
+		}
+		//printf("line %d", y);
+		if (draw_mode == 1) {  // desenhar o conte˙do da janela linha a linha
+			drawPoints();
+			index_pos = 0;
+			index_col = 0;
+		}
+	}
+
+	if (draw_mode == 2) //preenchar o conte˙do da janela com uma imagem completa
+		drawPoints();
+
+	printf("Terminou!\n");
+
+}
+
+
 void cleanup()
 {
     destroyShaderProgram();
@@ -514,7 +599,10 @@ void reshape(int w, int h)
 void setupCallbacks()
 {
     glutCloseFunc(cleanup);
-    glutDisplayFunc(renderScene);
+	if (DEPTH_OF_FIELD)
+		glutDisplayFunc(depthOfFieldRenderScene);
+	else
+		glutDisplayFunc(renderScene);
     glutReshapeFunc(reshape);
 }
 
@@ -566,7 +654,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/testFile2.nff"));
+	scene = new Scene(std::string("NFF/depthOfField.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

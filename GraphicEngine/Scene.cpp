@@ -99,6 +99,13 @@ void Scene::parseLine(std::stringstream& sin) {
 	}
 }
 
+float Scene::getDF() {
+	Vector3 eye = camera.eye;
+	Vector3 at = camera.at;
+	Vector3 ze = (eye - at).normalize();
+	return ze.length();
+}
+
 const void Scene::parseFile(std::string& filename) {
 	std::ifstream ifile(filename);
 	while (ifile.good()) {
@@ -106,6 +113,34 @@ const void Scene::parseFile(std::string& filename) {
 		std::getline(ifile, line);
 		parseLine(std::stringstream(line));
 	}
+}
+
+Vector3 Scene::getZe() {
+	Vector3 eye = camera.eye;
+	Vector3 at = camera.at;
+	Vector3 up = camera.up;
+
+	return (eye - at).normalize();
+}
+
+Vector3 Scene::getXe() {
+	Vector3 eye = camera.eye;
+	Vector3 at = camera.at;
+	Vector3 up = camera.up;
+
+	Vector3 ze = (eye - at).normalize();
+	return up.cross(ze).normalize();
+}
+
+Vector3 Scene::getYe() {
+	Vector3 eye = camera.eye;
+	Vector3 at = camera.at;
+	Vector3 up = camera.up;
+
+	//Camera Frame - XeYeZe (uvn)
+	Vector3 ze = (eye - at).normalize();
+	Vector3 xe = up.cross(ze).normalize();
+	return ze.cross(xe);
 }
 
 Ray Scene::camGetPrimaryRay(int x, int y) {

@@ -13,6 +13,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Utils.h"
+#include "Vectors.h"
 
 class Scene {
 
@@ -27,7 +28,6 @@ public:
 	std::vector<Poly*> polys;
 	int verticesCount = -1;
 	int polyID = -1;
-
 
 	std::vector<Light> lights;
 	std::vector<GeometricObject*> objects;
@@ -48,6 +48,13 @@ public:
 	void parseSphere(std::stringstream& sin);
 
 	void parseLine(std::stringstream& sin);
+
+	float getDF();
+
+	Vector3 getZe();
+	Vector3 getXe();
+	Vector3 getYe();
+
 	const void parseFile(std::string& filename);
 
 	//calculate Primary Rays
