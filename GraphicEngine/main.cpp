@@ -28,7 +28,7 @@
 #define DELTA 1.0001
 #define THRESH 0.3
 #define MAX_DEPTH 6
-#define SHADOW_MAX_RAYS 25
+#define SHADOW_MAX_RAYS 1
 
 Color shadowColor;
 
@@ -424,7 +424,7 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	float nextDelta = 1 / (n + 1);
 	color[0] = adaptativeSuperSampling(x, y, n);
 	color[1] = adaptativeSuperSampling(x + nextDelta, y, n);
-	color[2] = adaptativeSuperSampling(x, y+ nextDelta, n);
+	color[2] = adaptativeSuperSampling(x, y + nextDelta, n);
 	color[3] = adaptativeSuperSampling(x + nextDelta, y + nextDelta, n);
 	return averageColor(color[0], color[1], color[2], color[3]);
 
@@ -566,7 +566,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/balls_low.nff"));
+	scene = new Scene(std::string("NFF/testFile2.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

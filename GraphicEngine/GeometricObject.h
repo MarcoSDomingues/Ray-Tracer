@@ -7,6 +7,8 @@ class GeometricObject {
 public:
 
 	Material material;
+	Vector3 boundingBoxMin;
+	Vector3 boundingBoxMax;
 
 	GeometricObject(Material mat)
 		: material(mat) {}
