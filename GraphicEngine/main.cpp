@@ -379,6 +379,14 @@ Color averageColor(Color c1, Color c2, Color c3, Color c4) {
 	return color;
 }
 
+Color averageColor(Color c1, Color c2) {
+    Color color;
+    color.r = (c1.r + c2.r) / 2.0f;
+    color.g = (c1.g + c2.g) / 2.0f;
+    color.b = (c1.b + c2.b) / 2.0f;
+    return color;
+}
+
 
 bool compareColors(Color c1, Color c2) {
 	float diff = std::abs(c1.r - c2.r) + std::abs(c1.g - c2.g) + std::abs(c1.b - c2.b);
@@ -410,11 +418,8 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	ray = scene->camGetPrimaryRay(x, y + delta);
 	color[3] = rayTracing(ray, 1, 1.0);
 
-	if (compareColors(color[0], color[1])) {
-		if (compareColors(color[2], color[3])) {
-			if (compareColors(color[0], color[2]))
-				return averageColor(color[0], color[1], color[2], color[3]);
-		}
+	if (compareColors(averageColor(color[0], color[2]), averageColor(color[1], color[3]))) {
+	    return averageColor(color[0], color[1], color[2], color[3]);
 	}
 
 	n++;
