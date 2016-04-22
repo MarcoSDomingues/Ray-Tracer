@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include "Vectors.h"
 
+const double 	kEpsilon = 0.0001;
+const double	kHugeValue = 1.0E10;
+const float		kOffset = 0.01;
+
 typedef struct {
 	float r, g, b;
 } Color;

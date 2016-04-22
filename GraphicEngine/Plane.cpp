@@ -32,3 +32,7 @@ bool Plane::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance
 	return true;
 
 }
+
+BBox Plane::get_bounding_box() {
+	return bbox;
+}

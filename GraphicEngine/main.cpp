@@ -30,13 +30,13 @@
 #define DELTA 1.0001
 #define THRESH 0.3
 #define MAX_DEPTH 6
-#define SHADOW_MAX_RAYS 1
+#define SHADOW_MAX_RAYS 10
 
 //DEPTH OF FIELD CONSTANTS
-#define DEPTH_OF_FIELD 0 // Enable Depth of Field
-#define NUM_SAMPLES 16
-#define FOCAL_DISTANCE 2.0
-#define LENS_RADIUS 0.1
+#define DEPTH_OF_FIELD 1 // Enable Depth of Field
+#define NUM_SAMPLES 10
+#define FOCAL_DISTANCE 2.5   //RED -> 3.0 , GREEN -> 5.0 , BLUE -> 7.0
+#define LENS_RADIUS 1.0
 
 Color shadowColor;
 
@@ -68,10 +68,12 @@ Ray secondIt[4];
 
 ///////////////////////////////////////////////////////////////////////  RAY-TRACE SCENE
 
-float randomNumber() {
-	float r = rand() % 10;
-	float random = r / (r + 2);
-	return roundf(random * 10) / 10;
+float randomNumber(float a, float b) {
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return 0.41231231;
+	//return a + r;
 }
 
 Color rayTracing(Ray ray, int depth, float RefrIndex)
@@ -79,6 +81,9 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Color color;
 
 	bool reflectiveObject = true;
+
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
 	int objID = 0;
 	Vector3 hitPoint, hit;
@@ -126,6 +131,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 		Vector3 V = (scene->camera.eye - hitPoint).normalize();
 
 		for (int i = 0; i < scene->lights.size(); i++) {
+
 			Light light = scene->lights[i];
 			Vector3 lightPos = Vector3(light.x, light.y, light.z);
 
@@ -133,8 +139,11 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 b = Vector3(0.0f, 1.0f, 0.0f);
 
 			for (int k = 0; k < SHADOW_MAX_RAYS; k++) {
-				float j = 0.1;
-				Vector3 LP = lightPos + (randomNumber() * a) + (randomNumber() * b);
+				//std::cout << randomNumber(0.0f, 1.0f) << std::endl;
+				float rx = distribution(generator);
+				float ry = distribution(generator);
+
+				Vector3 LP = lightPos + (rx * a) + (ry * b);
 
 				Vector3 L = (LP - hitPoint).normalize();
 				Vector3 Ln = (L.dot(n) * n);
@@ -489,11 +498,14 @@ void renderScene()
     printf("Terminou!\n");
 }
 
-void depthOfFieldRenderScene() {
+void depthOfFieldRenderScene() { 
 	int index_pos = 0;
 	int index_col = 0;
 
 	DepthOfField *dof = new DepthOfField(scene->getDF(), FOCAL_DISTANCE, LENS_RADIUS, NUM_SAMPLES);
+
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
 	Color color;
 	Color auxColor;
@@ -518,8 +530,11 @@ void depthOfFieldRenderScene() {
 			color.b = 0.0f;
 
 			for (int i = 0; i < dof->numOfSamples; i++) {
-				
-				Vector2 dp = Vector2(randomNumber(), randomNumber());
+
+				float rx = distribution(generator);
+				float ry = distribution(generator);
+
+				Vector2 dp = Vector2(rx, ry);
 				Vector2 lp = Vector2(dp.x * dof->lensRadius, dp.y * dof->lensRadius);
 
 				Vector3 L = scene->camera.eye + lp.x * u + lp.y * v;
@@ -659,7 +674,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/depthOfField.nff"));
+	scene = new Scene(std::string("NFF/testFile.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

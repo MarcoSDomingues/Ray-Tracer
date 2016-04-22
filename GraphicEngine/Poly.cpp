@@ -74,3 +74,7 @@ bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance,
 
 	return (alpha >= 0.0f && beta >= 0.0f && (alpha + beta) <= 1.0f);
 }
+
+BBox Poly::get_bounding_box() {
+	return bbox;
+}

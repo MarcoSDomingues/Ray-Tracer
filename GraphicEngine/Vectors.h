@@ -60,6 +60,7 @@ struct Vector3 {
 
 	// ctors
 	Vector3() : x(0), y(0), z(0) {};
+	Vector3(float k) : x(k), y(k), z(k) {};
 	Vector3(float x, float y, float z) : x(x), y(y), z(z) {};
 
 	// utils functions

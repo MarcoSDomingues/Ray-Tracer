@@ -148,8 +148,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BBox.cpp" />
     <ClCompile Include="DepthOfField.cpp" />
     <ClCompile Include="GeometricObject.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Poly.cpp" />
@@ -157,8 +159,10 @@
     <ClCompile Include="Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BBox.h" />
     <ClInclude Include="DepthOfField.h" />
     <ClInclude Include="GeometricObject.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Poly.h" />
     <ClInclude Include="Scene.h" />

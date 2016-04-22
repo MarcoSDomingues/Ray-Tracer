@@ -62,3 +62,7 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 	return true;
 
 }
+
+BBox Sphere::get_bounding_box() {
+	return bbox;
+}
