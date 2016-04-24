@@ -34,9 +34,9 @@
 
 //DEPTH OF FIELD CONSTANTS
 #define DEPTH_OF_FIELD 1 // Enable Depth of Field
-#define NUM_SAMPLES 10
-#define FOCAL_DISTANCE 2.5   //RED -> 3.0 , GREEN -> 5.0 , BLUE -> 7.0
-#define LENS_RADIUS 1.0
+#define NUM_SAMPLES 16
+#define FOCAL_DISTANCE 3.0   //RED -> 3.0 , GREEN -> 5.0 , BLUE -> 7.0
+#define LENS_RADIUS 0.1
 
 Color shadowColor;
 
@@ -72,8 +72,7 @@ float randomNumber(float a, float b) {
 	float random = ((float)rand()) / (float)RAND_MAX;
 	float diff = b - a;
 	float r = random * diff;
-	return 0.41231231;
-	//return a + r;
+	return a + r;
 }
 
 Color rayTracing(Ray ray, int depth, float RefrIndex)
@@ -82,9 +81,6 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 	bool reflectiveObject = true;
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-
 	int objID = 0;
 	Vector3 hitPoint, hit;
 	bool has_collision = false;
@@ -92,12 +88,11 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	float distance = 0.0f;
 	Vector3 normal;
 	Vector3 normalHitPoint;
+	float tmin;
 
-	//std::cout << ray.direction.x << " " << ray.direction.y << "  " << ray.direction.z << std::endl;
-    //intersect ray with all objects
 	float maxDistance = -1;
 	for (int i = 0; i < scene->objects.size(); i++) {
-		if (scene->objects[i]->checkIntersection(ray, hit, distance, normal)) {
+		if (scene->objects[i]->checkIntersection(ray, hit, tmin, distance, normal)) {
 			if (distance <= maxDistance || maxDistance == -1) {
 				maxDistance = distance;
 				hitPoint = hit;
@@ -139,11 +134,8 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			Vector3 b = Vector3(0.0f, 1.0f, 0.0f);
 
 			for (int k = 0; k < SHADOW_MAX_RAYS; k++) {
-				//std::cout << randomNumber(0.0f, 1.0f) << std::endl;
-				float rx = distribution(generator);
-				float ry = distribution(generator);
 
-				Vector3 LP = lightPos + (rx * a) + (ry * b);
+				Vector3 LP = lightPos + (randomNumber(0.0f, 1.0f) * a) + (randomNumber(0.0f, 1.0f) * b);
 
 				Vector3 L = (LP - hitPoint).normalize();
 				Vector3 Ln = (L.dot(n) * n);
@@ -166,7 +158,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 					for (int k = 0; k < scene->objects.size(); k++) {
 						if (k != objID) {
-							if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, dist, normal)) {
+							if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, tmin, dist, normal)) {
 								in_dark = true;
 							}
 						}
@@ -399,7 +391,7 @@ Color averageColor(Color c1, Color c2) {
 
 bool compareColors(Color c1, Color c2) {
 	float diff = std::abs(c1.r - c2.r) + std::abs(c1.g - c2.g) + std::abs(c1.b - c2.b);
-	if (diff < 3.0f) {
+	if (diff < 0.3f) {
 		return true;
 	}
 	return false;
@@ -432,11 +424,6 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	}
 
 	n++;
-
-	if (auxN != n) { //para debug
-		auxN = n;
-		std::cout << n << std::endl;
-	}
 
 	if (n == 3) {
 		std::cout << "fim\n";
@@ -674,7 +661,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/testFile.nff"));
+	scene = new Scene(std::string("NFF/depthOfField.nff"));
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

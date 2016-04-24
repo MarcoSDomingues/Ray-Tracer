@@ -1,6 +1,6 @@
 #include "Sphere.h"
 
-bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance, Vector3 &normal) {
+bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal) {
 
 	//Vector3 sCenter = Vector3(center.x, center.y, center.z);
 	Vector3 rayDirection = ray.direction;
@@ -45,6 +45,8 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distanc
 		t = B + sqrt(R);
 	}
 	
+	tmin = t;
+
 	//Calculate intersection point
 	hitpoint.x = ray.origin.x + ray.direction.x * t;
 	hitpoint.y = ray.origin.y + ray.direction.y * t;

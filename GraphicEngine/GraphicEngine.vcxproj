@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BBox.cpp" />
+    <ClCompile Include="Compound.cpp" />
     <ClCompile Include="DepthOfField.cpp" />
     <ClCompile Include="GeometricObject.cpp" />
     <ClCompile Include="Grid.cpp" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BBox.h" />
+    <ClInclude Include="Compound.h" />
     <ClInclude Include="DepthOfField.h" />
     <ClInclude Include="GeometricObject.h" />
     <ClInclude Include="Grid.h" />

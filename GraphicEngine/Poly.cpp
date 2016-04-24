@@ -1,6 +1,6 @@
 #include "Poly.h"
 
-bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance, Vector3 &normal) {
+bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal) {
 
 	Vector3 a = (vertices[1] - vertices[0]);
 	Vector3 b = (vertices[2] - vertices[0]);
@@ -39,6 +39,8 @@ bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance,
 	hitpoint.y = ray.origin.y + ray.direction.y * t;
 	hitpoint.z = ray.origin.z + ray.direction.z * t;
 
+	tmin = t;
+
 	float P[3] = { hitpoint.x, hitpoint.y, hitpoint.z };
 	float V0[3] = { vertices[0].x, vertices[0].y ,vertices[0].z };
 	float V1[3] = { vertices[1].x, vertices[1].y ,vertices[1].z };
@@ -70,7 +72,6 @@ bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &distance,
 
 	normal = n;
 	distance = (ray.origin - hitpoint).length();
-	
 
 	return (alpha >= 0.0f && beta >= 0.0f && (alpha + beta) <= 1.0f);
 }

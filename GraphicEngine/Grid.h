@@ -5,8 +5,9 @@
 #include "GeometricObject.h"
 #include "BBox.h"
 #include "Scene.h"
+#include "Compound.h"
 
-class Grid {
+class Grid : public Compound {
 
 private:
 
@@ -21,11 +22,19 @@ private:
 
 public:
 
-	Grid(Scene* s) {
+	Grid(Scene* s) : Compound() {
 		scene = s;
+		nx = 0;
+		ny = 0;
+		nz = 0;
 	}
 
-	BBox getBoundingBox();
+	virtual BBox get_bounding_box();
 	void setup_cells();
+
+	float clamp(float x, float min, float max);
+
+	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal);
+	void add_object(GeometricObject* object_ptr) {}
 
 };
