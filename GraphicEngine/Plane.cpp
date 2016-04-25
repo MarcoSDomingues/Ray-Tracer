@@ -30,6 +30,7 @@ bool Plane::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, fl
 	hitpoint.z = ray.origin.z + ray.direction.z * t;
 
 	tmin = t;
+	m = material;
 
 	return true;
 

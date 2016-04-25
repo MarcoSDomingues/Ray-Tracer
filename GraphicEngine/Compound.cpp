@@ -22,12 +22,15 @@ bool Compound::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin,
 	Material mm;
 	Vector3 hit_point, n;
 
+	//std::cout << "lele" << std::endl;
 	for (int j = 0; j < num_objects; j++) {
 		if (objects[j]->checkIntersection(ray, hit_point, t, dist, n, mm) && (t < tmin)) {
 			hit = true;
 			tmin = t;
 			normal = n;
+			distance = dist;
 			hitpoint = hit_point;
+			m = mm;
 		}
 	}
 

@@ -47,6 +47,7 @@ bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, f
 	
 	tmin = t;
 
+	m = material;
 	//Calculate intersection point
 	hitpoint.x = ray.origin.x + ray.direction.x * t;
 	hitpoint.y = ray.origin.y + ray.direction.y * t;

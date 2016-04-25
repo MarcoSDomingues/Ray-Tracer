@@ -14,12 +14,12 @@ public:
 
 	Plane(const Point &a, const Point &b, const Point &c, const Material &mat)
 		: GeometricObject(mat), p1(a), p2(b), p3(c) {
-		bbox.x0 = p3.x - kOffset;
-		bbox.x1 = p1.x + kOffset;
-		bbox.y0 = p3.y - kOffset;
-		bbox.y1 = p1.y + kOffset;
-		bbox.z0 = p3.z - kOffset;
-		bbox.z1 = p1.z + kOffset;
+		bbox.x0 = -50;
+		bbox.x1 = 50;
+		bbox.y0 = -50;
+		bbox.y1 = 50;
+		bbox.z0 = -50;
+		bbox.z1 = p1.z;
 	}
 
 	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m);

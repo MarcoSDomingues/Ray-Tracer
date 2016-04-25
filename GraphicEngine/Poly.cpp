@@ -70,6 +70,7 @@ bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 		alpha = (u.x - beta * u.z) / u.y;
 	}
 
+	m = material;
 	normal = n;
 	distance = (ray.origin - hitpoint).length();
 

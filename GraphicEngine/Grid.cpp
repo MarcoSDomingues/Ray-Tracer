@@ -67,9 +67,6 @@ void Grid::setup_cells() {
 	bbox.y1 = p1.y;
 	bbox.z0 = p0.z;
 	bbox.z1 = p1.z;
-	std::cout << bbox.x0 << " ; " << bbox.x1 << std::endl;
-	std::cout << bbox.y0 << " ; " << bbox.y1 << std::endl;
-	std::cout << bbox.z0 << " ; " << bbox.z1 << std::endl;
 
 	// compute the number of grid cells in the x, y, and z directions
 	int num_objects = scene->objects.size();
@@ -89,6 +86,7 @@ void Grid::setup_cells() {
 
 	// set up the array of grid cells with null pointers
 
+	
 	int num_cells = nx * ny * nz;
 	cells.reserve(num_objects);
 
@@ -352,7 +350,7 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 				normal = n;
 				tmin = t;
 				distance = dist;
-				m = object_ptr->material;
+				m = mm;
 				return true;
 			}
 
@@ -369,7 +367,7 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 					normal = n;
 					tmin = t;
 					distance = dist;
-					m = object_ptr->material;
+					m = mm;
 					return (true);
 				}
 
@@ -385,7 +383,7 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 					normal = n;
 					tmin = t;
 					distance = dist;
-					m = object_ptr->material;
+					m = mm;
 					return (true);
 				}
 

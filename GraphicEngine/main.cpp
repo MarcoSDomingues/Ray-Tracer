@@ -31,7 +31,7 @@
 #define DELTA 1.0001
 #define THRESH 0.3
 #define MAX_DEPTH 6
-#define SHADOW_MAX_RAYS 10
+#define SHADOW_MAX_RAYS 9
 
 //DEPTH OF FIELD CONSTANTS
 #define DEPTH_OF_FIELD 0 // Enable Depth of Field
@@ -820,7 +820,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/depthOfField.nff"));
+	scene = new Scene(std::string("NFF/balls_medium.nff"));
 
 	grid = new Grid(scene);
 	grid->setup_cells();
