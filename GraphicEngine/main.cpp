@@ -31,7 +31,7 @@
 #define DELTA 1.0001
 #define THRESH 0.3
 #define MAX_DEPTH 6
-#define SHADOW_MAX_RAYS 9
+#define SHADOW_MAX_RAYS 1
 
 //DEPTH OF FIELD CONSTANTS
 #define DEPTH_OF_FIELD 0 // Enable Depth of Field
@@ -83,7 +83,7 @@ float randomNumber(float a, float b) {
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
 	Color color;
-	float epsilon = 1E-3;
+	float epsilon = 1E-1;
 	bool reflectiveObject = true;
 
 	int objID = 0;
@@ -226,7 +226,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 Color rayTracingGrid(Ray ray, int depth, float RefrIndex)
 {
 	Color color;
-	float epsilon = 1E-3;
+	float epsilon = 1E-1;
 	bool reflectiveObject = true;
 
 	Vector3 hitPoint, hit;
@@ -820,10 +820,12 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/mount_low.nff"));
-
-	grid = new Grid(scene);
-	grid->setup_cells();
+	scene = new Scene(std::string("NFF/mount_very_high.nff"));
+	
+	if (GRID) {
+		grid = new Grid(scene);
+		grid->setup_cells();
+	}
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

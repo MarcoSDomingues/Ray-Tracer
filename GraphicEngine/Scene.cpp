@@ -81,7 +81,6 @@ void Scene::parseLine(std::stringstream& sin) {
 	else if (s.compare("s") == 0) parseSphere(sin);
 	else if (s.compare("p") == 0) {
 		sin >> verticesCount;
-		std::cout << verticesCount << std::endl;
 		Poly *poly = new Poly(mat);
 		polys.push_back(poly);
 		polyID++;
