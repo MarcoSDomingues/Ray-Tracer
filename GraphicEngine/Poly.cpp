@@ -1,6 +1,6 @@
 #include "Poly.h"
 
-bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal) {
+bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m) {
 
 	Vector3 a = (vertices[1] - vertices[0]);
 	Vector3 b = (vertices[2] - vertices[0]);

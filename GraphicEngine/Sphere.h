@@ -22,7 +22,7 @@ public:
 		bbox.z1 = center.z + radius;
 	}
 
-	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal);
+	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m);
 
 	BBox get_bounding_box();
 	void add_object(GeometricObject* object_ptr) {}

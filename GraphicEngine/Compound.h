@@ -20,6 +20,6 @@ public:
 	int get_num_objects(void);
 	BBox get_bounding_box();
 
-	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint,float &tmin, float &distance, Vector3 &normal);
+	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint,float &tmin, float &distance, Vector3 &normal, Material &m);
 
 };

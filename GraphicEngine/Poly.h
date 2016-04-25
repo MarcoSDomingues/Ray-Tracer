@@ -17,15 +17,15 @@ public:
 
 	Poly(const Material &mat)
 		: GeometricObject(mat) {
-		bbox.x0 = vertices[0].x + kOffset;
-		bbox.x1 = vertices[2].x - kOffset;
-		bbox.y0 = vertices[0].y + kOffset;
-		bbox.y1 = vertices[2].y - kOffset;
-		bbox.z0 = vertices[0].z + kOffset;
-		bbox.z1 = vertices[2].z - kOffset;
+		bbox.x0 = vertices[2].x - kOffset;
+		bbox.x1 = vertices[0].x + kOffset;
+		bbox.y0 = vertices[2].y - kOffset;
+		bbox.y1 = vertices[0].y + kOffset;
+		bbox.z0 = vertices[2].z - kOffset;
+		bbox.z1 = vertices[0].z + kOffset;
 	}
 
-	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal);
+	bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m);
 
 	BBox get_bounding_box();
 	void add_object(GeometricObject* object_ptr) {}

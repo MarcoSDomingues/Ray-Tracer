@@ -13,16 +13,17 @@ BBox Compound::get_bounding_box() {
 	return bbox;
 }
 
-bool Compound::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal) {
+bool Compound::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m) {
 	float t, dist;
 	bool hit = false;
 	tmin = kHugeValue;
 	int num_objects = objects.size();
 
+	Material mm;
 	Vector3 hit_point, n;
 
 	for (int j = 0; j < num_objects; j++) {
-		if (objects[j]->checkIntersection(ray, hit_point, t, dist, n) && (t < tmin)) {
+		if (objects[j]->checkIntersection(ray, hit_point, t, dist, n, mm) && (t < tmin)) {
 			hit = true;
 			tmin = t;
 			normal = n;

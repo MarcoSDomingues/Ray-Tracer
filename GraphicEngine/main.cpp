@@ -21,6 +21,7 @@
 #include "Vectors.h"
 #include "Utils.h"
 #include "DepthOfField.h"
+#include "Grid.h"
 
 #define CAPTION "Ray Tracer"
 
@@ -33,10 +34,12 @@
 #define SHADOW_MAX_RAYS 10
 
 //DEPTH OF FIELD CONSTANTS
-#define DEPTH_OF_FIELD 1 // Enable Depth of Field
+#define DEPTH_OF_FIELD 0 // Enable Depth of Field
 #define NUM_SAMPLES 16
 #define FOCAL_DISTANCE 3.0   //RED -> 3.0 , GREEN -> 5.0 , BLUE -> 7.0
 #define LENS_RADIUS 0.1
+
+#define GRID 1
 
 Color shadowColor;
 
@@ -56,6 +59,8 @@ GLuint VertexShaderId, FragmentShaderId, ProgramId;
 GLint UniformId;
 
 Scene* scene = NULL;
+Grid* grid = NULL;
+
 int RES_X, RES_Y;
 
 /* Draw Mode: 0 - point by point; 1 - line by line; 2 - full frame */
@@ -78,7 +83,7 @@ float randomNumber(float a, float b) {
 Color rayTracing(Ray ray, int depth, float RefrIndex)
 {
 	Color color;
-
+	float epsilon = 1E-3;
 	bool reflectiveObject = true;
 
 	int objID = 0;
@@ -89,10 +94,10 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 	Vector3 normal;
 	Vector3 normalHitPoint;
 	float tmin;
-
+	Material material;
 	float maxDistance = -1;
 	for (int i = 0; i < scene->objects.size(); i++) {
-		if (scene->objects[i]->checkIntersection(ray, hit, tmin, distance, normal)) {
+		if (scene->objects[i]->checkIntersection(ray, hit, tmin, distance, normal, material)) {
 			if (distance <= maxDistance || maxDistance == -1) {
 				maxDistance = distance;
 				hitPoint = hit;
@@ -149,7 +154,7 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 
 				if (L.dot(n) > 0.0) {
 					Ray shadowFeeler;
-					shadowFeeler.origin = hitPoint * DELTA;
+					shadowFeeler.origin = hitPoint + epsilon * L;
 					shadowFeeler.direction = L;
 
 
@@ -157,10 +162,8 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 					float dist;
 
 					for (int k = 0; k < scene->objects.size(); k++) {
-						if (k != objID) {
-							if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, tmin, dist, normal)) {
-								in_dark = true;
-							}
+						if (scene->objects[k]->checkIntersection(shadowFeeler, hitShadow, tmin, dist, normal, material)) {
+							in_dark = true;
 						}
 					}
 
@@ -211,6 +214,145 @@ Color rayTracing(Ray ray, int depth, float RefrIndex)
 			refractedRay.direction = Rt;
 
 			Color tColor = rayTracing(refractedRay, depth + 1, 1.0);
+			color.r += tColor.r * mat.t;
+			color.g += tColor.g * mat.t;
+			color.b += tColor.b * mat.t;
+		}
+
+		return color;
+	}
+}
+
+Color rayTracingGrid(Ray ray, int depth, float RefrIndex)
+{
+	Color color;
+	float epsilon = 1E-3;
+	bool reflectiveObject = true;
+
+	Vector3 hitPoint, hit;
+	bool has_collision = false;
+
+	float distance = 0.0f;
+	Vector3 normal;
+	Vector3 normalHitPoint;
+	float tmin;
+	Material material;
+	float maxDistance = -1;
+	if (grid->checkIntersection(ray, hit, tmin, distance, normal, material)) {
+		if (distance <= maxDistance || maxDistance == -1) {
+			maxDistance = distance;
+			hitPoint = hit;
+			has_collision = true;
+			normalHitPoint = normal;
+		}
+	}
+
+	if (!has_collision) {
+		color.r = scene->background[0];
+		color.g = scene->background[1];
+		color.b = scene->background[2];
+		return color;
+	}
+	else {
+
+		Material mat = material;
+		 
+
+		color.r = 0.0f;
+		color.g = 0.0f;
+		color.b = 0.0f;
+
+		shadowColor.r = 0.0f;
+		shadowColor.g = 0.0f;
+		shadowColor.b = 0.0f;
+
+		//compute normal at hitpoint
+		Vector3 n = normalHitPoint;
+		Vector3 V = (scene->camera.eye - hitPoint).normalize();
+
+		for (int i = 0; i < scene->lights.size(); i++) {
+
+			Light light = scene->lights[i];
+			Vector3 lightPos = Vector3(light.x, light.y, light.z);
+
+			Vector3 a = Vector3(1.0f, 0.0f, 0.0f);
+			Vector3 b = Vector3(0.0f, 1.0f, 0.0f);
+
+			for (int k = 0; k < SHADOW_MAX_RAYS; k++) {
+
+				Vector3 LP = lightPos + (randomNumber(0.0f, 1.0f) * a) + (randomNumber(0.0f, 1.0f) * b);
+
+				Vector3 L = (LP - hitPoint).normalize();
+				Vector3 Ln = (L.dot(n) * n);
+
+				Vector3 h = Ln - L;
+				Vector3 R = Ln + h;
+
+				bool in_dark = false;
+
+				float fs = 1.0f;
+
+				if (L.dot(n) > 0.0) {
+					Ray shadowFeeler;
+					shadowFeeler.origin = hitPoint + epsilon * L;
+					shadowFeeler.direction = L;
+
+
+					Vector3 hitShadow;
+					float dist;
+
+					Material aux;
+					if (grid->checkIntersection(shadowFeeler, hitShadow, tmin, dist, normal, aux)) {
+						in_dark = true;
+					}
+
+					if (in_dark) fs = 0.0f;
+
+					shadowColor.r += fs * ((light.r * (mat.r * mat.kd) * n.dot(L)) + (light.r * (mat.r * mat.ks) * h.dot(n)));
+					shadowColor.g += fs * ((light.g * (mat.g * mat.kd) * n.dot(L)) + (light.g * (mat.g * mat.ks) * h.dot(n)));
+					shadowColor.b += fs * ((light.b * (mat.b * mat.kd) * n.dot(L)) + (light.b * (mat.b * mat.ks) * h.dot(n)));
+
+					in_dark = false;
+				}
+			}
+
+			color.r = shadowColor.r / SHADOW_MAX_RAYS;
+			color.g = shadowColor.g / SHADOW_MAX_RAYS;
+			color.b = shadowColor.b / SHADOW_MAX_RAYS;
+		}
+
+		if (depth >= MAX_DEPTH)	return color;
+
+		if (mat.ks > 0.0) {
+			//compute input cosine and sine vectors
+			Vector3 Rr = 2 * (V.dot(n)) * n - V;
+
+			Ray reflectedRay;
+			reflectedRay.origin = hitPoint * DELTA;
+			reflectedRay.direction = Rr;
+
+			Color rColor = rayTracingGrid(reflectedRay, depth + 1, 1.0);
+			color.r += rColor.r * mat.ks;
+			color.g += rColor.g * mat.ks;
+			color.b += rColor.b * mat.ks;
+		}
+
+		if (mat.t > 0.0) {
+			Vector3 Vt = V.dot(n)*n - V;
+			float sinI = Vt.length();
+			float sinT = (RefrIndex / mat.iof) * sinI;
+
+			float cosT = sqrt(1 - pow(sinT, 2));
+
+			Vector3 t = (Vt / sinI).normalize();
+
+			Vector3 Rt = sinT * t + cosT * -n;
+
+			Ray refractedRay;
+			refractedRay.origin = hitPoint * DELTA;
+			refractedRay.direction = Rt;
+
+			Color tColor = rayTracingGrid(refractedRay, depth + 1, 1.0);
 			color.r += tColor.r * mat.t;
 			color.g += tColor.g * mat.t;
 			color.b += tColor.b * mat.t;
@@ -408,16 +550,28 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 
 	//monteCarlo
 	ray = scene->camGetPrimaryRay(x, y);
-	color[0] = rayTracing(ray, 1, 1.0);
-
+	if (GRID)
+		color[0] = rayTracingGrid(ray, 1, 1.0);
+	else
+		color[0] = rayTracing(ray, 1, 1.0);
+	
 	ray = scene->camGetPrimaryRay(x + delta, y);
-	color[1] = rayTracing(ray, 1, 1.0);
+	if (GRID)
+		color[1] = rayTracingGrid(ray, 1, 1.0);
+	else
+		color[1] = rayTracing(ray, 1, 1.0);
 
 	ray = scene->camGetPrimaryRay(x + delta, y + delta);
-	color[2] = rayTracing(ray, 1, 1.0);
+	if (GRID)
+		color[2] = rayTracingGrid(ray, 1, 1.0);
+	else
+		color[2] = rayTracing(ray, 1, 1.0);
 
 	ray = scene->camGetPrimaryRay(x, y + delta);
-	color[3] = rayTracing(ray, 1, 1.0);
+	if (GRID)
+		color[3] = rayTracing(ray, 1, 1.0);
+	else
+		color[3] = rayTracing(ray, 1, 1.0);
 
 	if (compareColors(averageColor(color[0], color[2]), averageColor(color[1], color[3]))) {
 	    return averageColor(color[0], color[1], color[2], color[3]);
@@ -426,7 +580,6 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 	n++;
 
 	if (n == 3) {
-		std::cout << "fim\n";
 		return averageColor(color[0], color[1], color[2], color[3]);
 	}
 
@@ -454,9 +607,12 @@ void renderScene()
 
             //YOUR 2 FUNTIONS:
             
-			color = adaptativeSuperSampling(x, y, 0);
-			//ray = scene->camGetPrimaryRay(x, y);
-			//color = rayTracing(ray, 1, 1.0);
+			//color = adaptativeSuperSampling(x, y, 0);
+			ray = scene->camGetPrimaryRay(x, y);
+			if (GRID)
+				color = rayTracingGrid(ray, 1, 1.0);
+			else
+				color = rayTracing(ray, 1, 1.0);
 
             
             vertices[index_pos++]= (float)x;
@@ -530,7 +686,10 @@ void depthOfFieldRenderScene() {
 				primaryRay.origin = L;
 				primaryRay.direction = (point - L).normalize();
 
-				auxColor = rayTracing(primaryRay, 1, 1.0f);
+				if (GRID)
+					auxColor = rayTracingGrid(primaryRay, 1, 1.0f);
+				else
+					auxColor = rayTracing(primaryRay, 1, 1.0f);
 				color.r += auxColor.r;
 				color.g += auxColor.g;
 				color.b += auxColor.b;
@@ -662,6 +821,9 @@ void init(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
 	scene = new Scene(std::string("NFF/depthOfField.nff"));
+
+	grid = new Grid(scene);
+	grid->setup_cells();
 
 	RES_X = scene->camera.resolution.WinX;
     RES_Y = scene->camera.resolution.WinY;

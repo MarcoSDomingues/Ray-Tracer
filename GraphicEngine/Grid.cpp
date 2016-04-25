@@ -67,6 +67,9 @@ void Grid::setup_cells() {
 	bbox.y1 = p1.y;
 	bbox.z0 = p0.z;
 	bbox.z1 = p1.z;
+	std::cout << bbox.x0 << " ; " << bbox.x1 << std::endl;
+	std::cout << bbox.y0 << " ; " << bbox.y1 << std::endl;
+	std::cout << bbox.z0 << " ; " << bbox.z1 << std::endl;
 
 	// compute the number of grid cells in the x, y, and z directions
 	int num_objects = scene->objects.size();
@@ -106,7 +109,7 @@ void Grid::setup_cells() {
 	int index;  	// cell's array index
 
 	for (int j = 0; j < num_objects; j++) {
-		obj_bBox = objects[j]->get_bounding_box();
+		obj_bBox = scene->objects[j]->get_bounding_box();
 
 		// compute the cell indices at the corners of the bounding box of the object
 
@@ -125,19 +128,19 @@ void Grid::setup_cells() {
 					index = ix + nx * iy + nx * ny * iz;
 
 					if (counts[index] == 0) {
-						cells[index] = objects[j];
+						cells[index] = scene->objects[j];
 						counts[index] += 1;  						// now = 1
 					}
 					else {
 						if (counts[index] == 1) {
 							Compound* compound_ptr = new Compound;  // construct a compound object
 							compound_ptr->add_object(cells[index]); // add object already in cell
-							compound_ptr->add_object(objects[j]);  	// add the new object
+							compound_ptr->add_object(scene->objects[j]);  	// add the new object
 							cells[index] = compound_ptr;			// store compound in current cell
 							counts[index] += 1;  					// now = 2
 						}
 						else {										// counts[index] > 1
-							cells[index]->add_object(objects[j]);	// just add current object
+							cells[index]->add_object(scene->objects[j]);	// just add current object
 							counts[index] += 1;						// for statistics only
 						}
 					}
@@ -182,7 +185,8 @@ void Grid::setup_cells() {
 	counts.erase(counts.begin(), counts.end());
 }
 
-bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal) {
+bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m) {
+	Material mm;
 	double ox = ray.origin.x;
 	double oy = ray.origin.y;
 	double oz = ray.origin.z;
@@ -334,7 +338,6 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 		iz_stop = -1;
 	}
 
-
 	// traverse the grid
 
 	Vector3 n;
@@ -343,13 +346,13 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 
 	while (true) {
 		GeometricObject* object_ptr = cells[ix + nx * iy + nx * ny * iz];
-
 		if (tx_next < ty_next && tx_next < tz_next) {
-			if (object_ptr && object_ptr->checkIntersection(ray, hit, t, dist, n) && t < tx_next) {
+			if (object_ptr && object_ptr->checkIntersection(ray, hit, t, dist, n, mm) && t < tx_next) {
 				hitpoint = hit;
 				normal = n;
 				tmin = t;
 				distance = dist;
+				m = object_ptr->material;
 				return true;
 			}
 
@@ -361,11 +364,12 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 		}
 		else {
 			if (ty_next < tz_next) {
-				if (object_ptr && object_ptr->checkIntersection(ray, hit, t, dist, n) && t < ty_next) {
+				if (object_ptr && object_ptr->checkIntersection(ray, hit, t, dist, n, mm) && t < ty_next) {
 					hitpoint = hit;
 					normal = n;
 					tmin = t;
 					distance = dist;
+					m = object_ptr->material;
 					return (true);
 				}
 
@@ -376,11 +380,12 @@ bool Grid::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 					return (false);
 			}
 			else {
-				if (object_ptr && object_ptr->checkIntersection(ray, hit, t, dist, n) && t < tz_next) {
+				if (object_ptr && object_ptr->checkIntersection(ray, hit, t, dist, n, mm) && t < tz_next) {
 					hitpoint = hit;
 					normal = n;
 					tmin = t;
 					distance = dist;
+					m = object_ptr->material;
 					return (true);
 				}
 

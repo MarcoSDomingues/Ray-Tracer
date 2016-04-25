@@ -1,6 +1,6 @@
 #include "Sphere.h"
 
-bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal) {
+bool Sphere::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m) {
 
 	//Vector3 sCenter = Vector3(center.x, center.y, center.z);
 	Vector3 rayDirection = ray.direction;

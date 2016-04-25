@@ -34,7 +34,7 @@ public:
 
 	float clamp(float x, float min, float max);
 
-	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal);
+	virtual bool checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, float &distance, Vector3 &normal, Material &m);
 	void add_object(GeometricObject* object_ptr) {}
 
 };
