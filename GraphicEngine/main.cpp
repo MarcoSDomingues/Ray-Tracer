@@ -820,7 +820,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/balls_medium.nff"));
+	scene = new Scene(std::string("NFF/mount_low.nff"));
 
 	grid = new Grid(scene);
 	grid->setup_cells();

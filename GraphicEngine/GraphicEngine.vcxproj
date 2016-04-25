@@ -172,6 +172,11 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Vectors.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="NFF\mount_high.nff" />
+    <None Include="NFF\mount_low.nff" />
+    <None Include="NFF\mount_very_high.nff" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

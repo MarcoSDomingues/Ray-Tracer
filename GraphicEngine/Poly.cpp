@@ -39,8 +39,6 @@ bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 	hitpoint.y = ray.origin.y + ray.direction.y * t;
 	hitpoint.z = ray.origin.z + ray.direction.z * t;
 
-	tmin = t;
-
 	float P[3] = { hitpoint.x, hitpoint.y, hitpoint.z };
 	float V0[3] = { vertices[0].x, vertices[0].y ,vertices[0].z };
 	float V1[3] = { vertices[1].x, vertices[1].y ,vertices[1].z };
@@ -70,6 +68,7 @@ bool Poly::checkIntersection(const Ray &ray, Vector3 &hitpoint, float &tmin, flo
 		alpha = (u.x - beta * u.z) / u.y;
 	}
 
+	tmin = t;
 	m = material;
 	normal = n;
 	distance = (ray.origin - hitpoint).length();

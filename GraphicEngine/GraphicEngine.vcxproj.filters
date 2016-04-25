@@ -81,4 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="NFF\mount_high.nff" />
+    <None Include="NFF\mount_low.nff" />
+    <None Include="NFF\mount_very_high.nff" />
+  </ItemGroup>
 </Project>

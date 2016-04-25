@@ -27,6 +27,7 @@ public:
 		nx = 0;
 		ny = 0;
 		nz = 0;
+		
 	}
 
 	virtual BBox get_bounding_box();
