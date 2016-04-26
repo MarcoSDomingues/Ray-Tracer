@@ -29,9 +29,9 @@
 #define COLOR_ATTRIB 1
 
 #define DELTA 1.0001
-#define THRESH 0.3
+#define THRESH 3
 #define MAX_DEPTH 6
-#define SHADOW_MAX_RAYS 1
+#define SHADOW_MAX_RAYS 5
 
 //DEPTH OF FIELD CONSTANTS
 #define DEPTH_OF_FIELD 0 // Enable Depth of Field
@@ -39,6 +39,7 @@
 #define FOCAL_DISTANCE 3.0   //RED -> 3.0 , GREEN -> 5.0 , BLUE -> 7.0
 #define LENS_RADIUS 0.1
 
+#define ANTIALIASING 0
 #define GRID 1
 
 Color shadowColor;
@@ -524,16 +525,16 @@ Color averageColor(Color c1, Color c2, Color c3, Color c4) {
 
 Color averageColor(Color c1, Color c2) {
     Color color;
-    color.r = (c1.r + c2.r) / 2.0f;
-    color.g = (c1.g + c2.g) / 2.0f;
-    color.b = (c1.b + c2.b) / 2.0f;
+    color.r = (c1.r + c2.r) / 2.0f + c1.r;
+    color.g = (c1.g + c2.g) / 2.0f + c1.g;
+    color.b = (c1.b + c2.b) / 2.0f + c1.b;
     return color;
 }
 
 
 bool compareColors(Color c1, Color c2) {
 	float diff = std::abs(c1.r - c2.r) + std::abs(c1.g - c2.g) + std::abs(c1.b - c2.b);
-	if (diff < 0.3f) {
+	if (diff < THRESH) {
 		return true;
 	}
 	return false;
@@ -569,14 +570,17 @@ Color adaptativeSuperSampling(int x, int y, int n) {
 
 	ray = scene->camGetPrimaryRay(x, y + delta);
 	if (GRID)
-		color[3] = rayTracing(ray, 1, 1.0);
+		color[3] = rayTracingGrid(ray, 1, 1.0);
 	else
 		color[3] = rayTracing(ray, 1, 1.0);
 
-	if (compareColors(averageColor(color[0], color[2]), averageColor(color[1], color[3]))) {
-	    return averageColor(color[0], color[1], color[2], color[3]);
-	}
-
+    if (compareColors(color[0], color[1]))
+        if (compareColors(color[0], color[2]))
+            if (compareColors(color[0], color[3]))
+                if (compareColors(color[1], color[2]))
+                    if (compareColors(color[1], color[2]))
+                        if (compareColors(color[2], color[3]))
+                            return averageColor(color[0], color[1], color[2], color[3]);
 	n++;
 
 	if (n == 3) {
@@ -607,13 +611,14 @@ void renderScene()
 
             //YOUR 2 FUNTIONS:
             
-			//color = adaptativeSuperSampling(x, y, 0);
-			ray = scene->camGetPrimaryRay(x, y);
-			if (GRID)
-				color = rayTracingGrid(ray, 1, 1.0);
-			else
-				color = rayTracing(ray, 1, 1.0);
-
+			if (ANTIALIASING) color = adaptativeSuperSampling(x, y, 0);
+            else {
+                ray = scene->camGetPrimaryRay(x, y);
+                if (GRID)
+                    color = rayTracingGrid(ray, 1, 1.0);
+                else
+                    color = rayTracing(ray, 1, 1.0);
+            }
             
             vertices[index_pos++]= (float)x;
             vertices[index_pos++]= (float)y;
@@ -820,7 +825,7 @@ void init(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	scene = new Scene(std::string("NFF/mount_very_high.nff"));
+	scene = new Scene(std::string("NFF/balls_low.nff"));
 	
 	if (GRID) {
 		grid = new Grid(scene);
